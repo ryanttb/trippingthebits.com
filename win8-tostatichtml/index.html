@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Title</title>
+  <title>Windows 8, jQuery Geo, and toStaticHTML</title>
 
-  <meta name="description" content="Title">
+  <meta name="description" content="Windows 8, jQuery Geo, and toStaticHTML">
   <meta name="author" content="Ryan Westphal">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,9 +23,31 @@
   <div id="frame">
     <div>
       <div id="content">
-        <h1>Title</h1>
-        <time>2010-01-01</time>
-        <p></p>
+        <h1>Windows 8, jQuery Geo, and toStaticHTML</h1>
+        <time>2012-09-10</time>
+        <p>I attended a Windows 8 DevCamp recently with the intention of installing Microsoft's latest OS for the first time and getting jQuery Geo to work as a native app on top of WinJS.</p>
+
+        <h2>Did it work?</h2>
+
+        <p><b>Yes!</b></p>
+
+        <p>Apart from ajax, jQuery itself works fine on WinJS's Chakra engine. jQuery Geo does not use ajax itself so this is not a problem.</p>
+
+        <p>The only change to the jQuery Geo source code I had to make was to surround any HTML text used to dynamically create elements with a Windows 8 JavaScript method: toStaticHtml. This is required when you pass HTML to any jQuery manipulation method such as append.</p>
+
+        <p>Before:</p>
+
+        <code><pre>.append( <span class="str">'&lt;div /&gt;'</span> )</pre></code>
+
+        <p>After:</p>
+
+        <code><pre>.append( toStaticHTML( <span class="str">'&lt;div /&gt;'</span> ) )</pre></code>
+
+        <h2>Discussion</h2>
+
+        <h3>Including jQuery</h3>
+
+        <p>With Windows 8, it is possible to code Windows Store apps in HTML, CSS, &amp; JavaScript. </p>
 
         <h2>Round trip</h2>
 
@@ -37,7 +59,7 @@
         <div id="tags">
           <ul>
             <li>
-              <a href="http://twitter.com/#search?q="></a>
+              <a href="http://twitter.com/#search?q=toStaticHTML">toStaticHTML on Twitter</a>
             </li>
           </ul>
         </div>
