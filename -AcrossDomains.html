@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Across domains</title>
+  <link href="styles/default.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="identity">
+    <a href="index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="facebook" href="http://www.facebook.com/westphal">f</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          Across domains</h1>
+        <time>2010-01-01</time>
+        <p>I want to provide access to a .NET web service from HTML files opened on a user&#39;s hard drive. I haven&#39;t needed to do this before and I do not want to open my whole domain up to attack. In this article I want to find out the following.</p>
+        <ol>
+          <li>
+            Can I access an online service from a local HTML file?</li>
+          <li>
+            Can I provide application/web service-level security rather than the whole domain?</li>
+        </ol>
+        <h2>
+          About the service</h2>
+        <p>
+          &nbsp;</p>
+        <p style="background-color: #00FF00">
+          Delete these notes</p>
+          <ul>
+            <li>
+              Having trouble finding information on file format itself</li>
+            <li>
+              Adobe created file format: <a href="http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html">http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html</a></li>
+            <li>
+              Will IIS even use it?</li>
+            <li>
+              IE8 works</li>
+            <li>
+              IIS doesn&#39;t see request, is this Firefox being secure and not even sending one?</li>
+            <li>
+              Try on my local IIS</li>
+            <li>
+              Even dev web server forbids it but gives 405 error to Firefox, IE8 still works</li>
+            <li>
+              Mention that I&#39;m using AJAX-enabled WCF services with OperationContract attribute</li>
+            <li>
+              Does NOT work in IE8 from a file, I must have been running on a dev web server</li>
+            <li>
+              There is a cross-domain security HTTP header, look it up</li>
+        </ul>
+          <p></p>
+        <h2>
+          Round trip</h2>
+      </div>
+      <div id="tags">
+        <ul>
+          <li>
+            <a href="http://twitter.com/#search?q=%23JavaScript">JavaScript</a>
+          </li>
+        </ul>
+      </div>
+      <div id="comments">
+        <h2>
+          Comments</h2>
+        <form action="comment.php" method="post">
+          <table>
+            <tbody>
+              <tr>
+                <th>
+                  <label for="commentDisplayName">
+                    Name</label>
+                </th>
+                <td>
+                  <input type="text" id="commentDisplayName" name="displayName" size="32" />
+                </td>
+              </tr>
+              <tr>
+                <th>
+                  <label for="commentWebsite">
+                    URL</label>
+                </th>
+                <td>
+                  <input type="text" id="commentWebsite" name="website" size="32" />
+                </td>
+              </tr>
+              <tr>
+                <th>
+                  <label for="commentText">
+                    Comment</label>
+                </th>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <textarea id="commentText" name="comment" rows="5" cols="36"></textarea>
+                </td>
+              </tr>
+              <tr>
+                <td id="commentCommands" colspan="2">
+                  <input type="hidden" id="commentEntry" name="entry" />
+                  <input type="submit" id="commentSend" value="Send" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.3.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(function() {
+      $("#commentEntry").val(window.location.href);
+    });
+  </script>
+
+</body>
+</html>

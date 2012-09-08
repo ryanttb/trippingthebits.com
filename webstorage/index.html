@@ -1,0 +1,381 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Web Storage</title>
+  <link href="../styles/default.css" rel="stylesheet" type="text/css" />
+  <style type="text/css">
+    #cmdPresent
+    {
+      border-radius: 36px;
+      -moz-border-radius: 36px;
+      -webkit-border-radius: 36px;
+      font-weight: bold;
+      height: 72px;
+      width: 72px;
+    }
+    h2.present
+    {
+      margin-bottom: 1.5em;
+    }
+    h3.present
+    {
+      font-size: 200%;
+      margin: 1em 0;
+    }
+    li.present, dt.present
+    {
+      font-size: 125%;
+      font-weight: bold;
+      margin: 1em 0;
+    }
+    dd.present
+    {
+      display: none;
+    }
+    p.present
+    {
+      display: none;
+    }
+    blockquote.present
+    {
+      font-size: 150%;
+      margin: 1.5em 0;
+    }
+    .footnoteMarker
+    {
+      color: #972F4E !important;
+      font-size: 150%;
+    }
+  </style>
+</head>
+<body>
+  <div id="identity">
+    <a href="../index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          Web Storage</h1>
+        <time>2010-05-26</time>
+        <br />
+        <input type="button" id="cmdPresent" class="fancyButton" value="Present!" />
+        <div class="slide">
+          <h2>
+            Introduction</h2>
+          <h3>
+            Ryan Westphal</h3>
+          <h3>
+            Web storage</h3>
+          <ul>
+            <li>
+              http://trippingthebits.com/webstorage/
+            </li>
+          </ul>
+          <h3>
+            Twitter</h3>
+          <ul>
+            <li>
+              @ryanttb</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <h2>
+            Basic concepts</h2>
+          <h3>
+            A new name</h3>
+          <p>
+            What used to be called HTML5 DOM Storage is now just Web Storage. It has its own <a href="http://dev.w3.org/html5/webstorage">spec</a>
+            which defines an</p>
+          <blockquote>
+            API for persistent data storage of key-value pair data in Web clients</blockquote>
+          <ul>
+            <li>
+              Not cookies
+              <p>
+                You can think of web storage like an upgrade to cookies. It handles a lot of the same situations but is much more powerful.</p>
+            </li>
+            <li>
+              Structured<a href="#support" class="footnoteMarker">*</a><p>
+                Cookies are always strings. Web Storage values are any object that conforms to the <i>structured clone algorithm</i> which is a spec&#39;s way of saying: it&#39;s not the same object, also no DOM nodes or binary data such as what you can retrieve from the canvas tag.</p>
+            </li>
+            <li>
+              Always client-side<p>
+                This is huge! Cookies are transmitted to the server on every single request. Web storage will never leave the user&#39;s browser on its own.</p>
+            </li>
+            <li>
+              Persistent
+              <p>
+                Depending on your website design, you can choose to store data only temporarily or keep it long after the browser has closed.</p>
+            </li>
+          </ul>
+        </div>
+        <div class="slide">
+          <h2>
+            Two types</h2>
+          <ul>
+            <li>
+              Session
+              <p>
+                You may be familiar with the term <i>session</i> and in web storage the concept is similar. Use session storage when you only want to keep data around until the user closes the browser window. They are done with your website for now and don&#39;t care if has forgotten what they were doing the next time they come back.</p>
+            </li>
+            <li>
+              Local<p>
+                Use local storage for data you want to keep around for when the user comes back to your site such as preferences.</p>
+            </li>
+          </ul>
+          <h3>
+            Cross-page</h3>
+          <p>
+            You can use both storage types to successfully keep application state across page transitions in the same window. A common situation is having a user click one of many items on a page. You can store the ID of that item in session storage, transition to the next page and retrieve the selected ID to show details.</p>
+          <h3>
+            Cross-tab/window</h3>
+          <p>
+            Local storage maintains your application state even in new windows you create with window.open or links targeting _blank. Changes to local session in one window are visible in the other.</p>
+          <p>
+            You may be inclind to think that session storage gives you cross-window access because session cookies gave you cross-window access but it doesn&#39;t. The spec explicitly defines it differently to avoid state from different sessions leaking into one another. Your session storage will be cloned when you create new windows but updates to one window&#39;s storage will not affect the others.</p>
+          <h3>
+            Persistence</h3>
+          <p>
+            Above &amp; beyond keeping state across windows, local storage also maintains it after all browser windows have been closed and even if the user reboots their computer. This is great for:</p>
+          <ul>
+            <li>
+              user preferences</li>
+            <li>
+              <i>temporary</i> offline storage</li>
+            <li>
+              caching</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <h2>
+            Technically speaking</h2>
+          <h3>
+            Standard</h3>
+          <p>
+            Web storage has a very simple API. You look for and choose sessionStorage or localStorage properties in the window object. Both storage objects have the same interface.</p>
+          <dl>
+            <dt>setItem(key, value)</dt>
+            <dd>
+              Adds an item to storage under the given key.</dd>
+            <dt>getItem(key)</dt>
+            <dd>
+              Retrieves the requested item from storage.</dd>
+            <dt>removeItem(key)</dt>
+            <dd>
+              Removes the requested item from storage.</dd>
+            <dt>clear()</dt>
+            <dd>
+              Removes all items from storage.</dd>
+            <dt>length</dt>
+            <dd>
+              Maintains the number of items in the storage.</dd>
+            <dt>key(index)</dt>
+            <dd>
+              Returns the key at the given index in storage. A key's index can change as you add and remove items from storage</dd>
+            <dt>storage</dt>
+            <dd>
+              The storage event fires whenever you call setItem or removeItem. Since sessionStorage cannot cross page boundaries the use of this event is limited as you, the programmer, have just directly modified the web storage. However, this event becomes a powerful cross-page communication method with localStorage. The user can modify values on one page and if you save the new values in localStorage you can handle the changes and update the UI in a completely separate window.</dd>
+          </dl>
+        </div>
+        
+        <div class="slide">
+          <h2>
+            <a name="support"></a>Support</h2>
+          <ul>
+            <li>
+              Firefox
+              <p>
+                Firefox 3.5 added full support.</p>
+            </li>
+            <li>
+              Chrome
+              <p>
+                Chrome 4 added support for local storage only.</p>
+            </li>
+            <li>
+              Internet Explorer
+              <p>
+                IE8 added support for both but their storage event is non-standard.</p>
+            </li>
+            <li>
+              Safari
+              <p>
+                Safari 4 added full support.</p>
+            </li>
+            <li>
+              Opera
+              <p>
+                Opera 10.5 added support for both but their storage event doesn&#39;t fire.</p>
+            </li>
+          </ul>
+          <h3>
+            Space</h3>
+          <ul>
+            <li>
+              5 megabytes</li>
+          </ul>
+          <p>
+            The web storage specification suggests that a user agent should provide at least five megabytes for each storage type for every origin. As far as I can tell, every major browser vendor has taken this to heart.
+          </p>
+        </div>
+        <div class="slide">
+          <h2>
+            Older methods</h2>
+          <ul>
+            <li>
+              userData behavior (IE 6 &amp; 7)</li>
+            <li>
+              globalStorage (Firefox 2)</li>
+            <li>
+              Gears (Chrome 3)</li>
+            <li>
+              SQLite (Safari 3)</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <h2>
+            Thinking differently</h2>
+          <h3>
+            Regenerate</h3>
+          <ul>
+            <li>
+              From a different page
+              <p>
+                Similar to how you might handle a site based entirely on the query section of a URL, you should be ready for a page refresh. Handle any stored values passed to your page from another in the startup code such as selected search result.</p>
+            </li>
+            <li>
+              On the current page
+              <p>
+                Going a step further, you can track in-page changes made by the user such as a selected tab. Put the tab ID in storage when it changes and handle reselecting that tab in your startup code as well even though it&#39;s not coming from another page.</p>
+            </li>
+            <li>
+              No history
+              <p>
+                You don&#39;t have to rely on browser history to maintain state and only need it if you really want some changes to act as a new page.</p>
+              <p>
+                I have set up a few sites where, after clicking a search result and switching tabs on the details page I want a refresh to maintain the tab state but still want the back button to or return to the search results.</p>
+            </li>
+          </ul>
+          <h3>
+            Include the query string</h3>
+          <p>
+            I suggest also supporting the query string.</p>
+          <p>
+            In a few websites I build an object based on the query string, then run through the storage object I&#39;m using to overwrite the query properties. This handles cases where, e.g., you want to allow bookmarks to search results as well as a selected result via the URL. Once on the page, the user can see the originally selected item&#39;s information but change which result is selected. Now, when they refresh the page, the query string will stay the same but the new selection is maintained.</p>
+          <h3>
+            Cleanup</h3>
+          <p>
+            When a page loads, I find it good practice to remove any storage you&#39;re not going to handle in that page. This all really depends on how you want the website to function but for me, returning to search results should clear any tab changes made on a details page.</p>
+        </div>
+        <div class="slide">
+          <h2>
+            Case study</h2>
+          <p>
+            A word game!</p>
+          <a href="speclibs/index.html" target="_blank">Play!</a>
+        </div>
+        <div class="slide">
+          <h2>webStorage test</h2>
+          <p>I put together a page to test the for the presence of web storage or one of the fallbacks used by the plugin. You can also play with storing and retrieving data as well as attempt to max out your storage.</p>
+          <a href="test.html">Test!</a>
+        </div>
+        <div class="slide">
+          <h2>
+            Gotchas</h2>
+          <h3>
+            Multiple apps on one domain</h3>
+          <p>
+            If you have to split an application out by directory instead of by subdomains, you need to be aware of which keys you use. The two applications will be able to see each other&#39;s local storage.</p>
+          <h3>
+            You cannot assume forever</h3>
+          <p>
+            The user can clear storage on you. Because of this, you should store any data that even marginally important to them in a server-side database. That said, there are plenty of uses.
+          </p>
+          <h3>
+            Storage event</h3>
+          <p>
+            The storage event fires in Internet Explorer but it doesn&#39;t give you any information.</p>
+          <p>
+            Opera don&#39;t seem to fire the storage event.</p>
+          <h3>
+            Chrome session</h3>
+          <p>
+            Chrome does not support session storage.</p>
+          <h3>
+            Not thread-safe</h3>
+          <p>
+            I haven&#39;t run into this issue at all yet but the specification warns that, for performance reasons, the storage event is not thread-safe. This makes it possible for one window to update a key in local session while another window is trying to read or update at the same time, so, just keep that in mind.</p>
+        </div>
+        <div class="slide">
+          <h2>
+            Round trip</h2>
+          <h3>
+            Frameworks</h3>
+          <ul>
+            <li>
+              webStorage &ndash; <a href="http://github.com/TrippingTheBits/webStorage">http://github.com/TrippingTheBits/webStorage</a></li>
+            <li>
+              jStorage &ndash; <a href="http://www.jstorage.info/">http://www.jstorage.info/</a></li>
+            <li>
+              Modernizer &ndash; <a href="http://www.modernizr.com/">http://www.modernizr.com/</a></li>
+          </ul>
+          <h3>
+            Questions?</h3>
+          <h3>
+            Thank you!</h3>
+        </div>
+      </div>
+      <div id="tags">
+        <ul>
+          <li>
+            <a href="http://twitter.com/#search?q=%23webstorage">web storage</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(function() {
+
+      $("#cmdPresent").click(function() {
+        if ($("h3").hasClass("present")) {
+          $("h2,h3,li,dt,dd,p,blockquote").removeClass("present");
+          $(".slide").css("height", "auto");
+          $(".slide").unbind("click");
+          $(this).val("Present!");
+        } else {
+          $("h2,h3,li,dt,dd,p,blockquote").addClass("present");
+          $(".slide").height($(window).height()).click(slideClick)[0].scrollIntoView();
+          $(this).val("Read!");
+        }
+      });
+
+      function slideClick() {
+        var nextSlide = $(this).next();
+        if (nextSlide.size() > 0) {
+          nextSlide[0].scrollIntoView();
+        }
+      }
+
+      $("#commentEntry").val(window.location.href);
+    });
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26113662-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s)
+    } (document, 'script'));
+  </script>
+</body>
+</html>

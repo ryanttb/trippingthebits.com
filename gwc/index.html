@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>GeoWebCache</title>
+  <link href="../styles/default.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="identity">
+    <a href="../index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          GeoWebCache</h1>
+        <time>2010-10-12</time>
+        <p>GeoWebCache (GWC) is a proxy service used to cache requests to other mapping-related services such as Web Mapping Service (WMS).</p>
+        <h2>No cache</h2>
+        <p>This morning, our GWC stopped caching tiles. The WMS still produces images if you request them directly but it is too slow.</p>
+        <p>We have been changing styles, I'm not sure if one of those changes broke the GWC.</p>
+        <h2>
+          Round trip</h2>
+      </div>
+      <div id="tags">
+        <ul>
+          <li>
+            <a href="http://twitter.com/#search?q=%23gwc"></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(function() {
+      $("#commentEntry").val(window.location.href);
+    });
+  </script>
+
+</body>
+</html>

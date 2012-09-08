@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Bulking up with Oracle</title>
+  <link href="styles/default.css" rel="stylesheet" type="text/css" />
+  <!-- code formatted by http://manoli.net/csharpformat/ -->
+</head>
+<body>
+  <div id="identity">
+    <a href="index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a> <a id="facebook" href="http://www.facebook.com/westphal">f</a> <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          Bulking up with Oracle</h1>
+        <time>2010-01-01</time>
+        <p>
+          I am inserting 27,000 rows into an Oracle table from a .NET console application. The row data comes from other tables in the database through queries, calculations &amp; secondary queries based on the first ones. The application solidly grinds through the task but is not feel performant. It currently takes a little over three hours for all 27,000 new records. I want to speed it up but I am relatively new to Oracle.</p>
+        <h2>
+          A note about transactions</h2>
+        <p>
+          I thought about database transactions first. The atomic nature of a transaction sounds like it should operate a little faster than one-by-one <code>INSERT</code> statements. A brief look into the Oracle documentation disproves that theory.</p>
+        <blockquote>
+          A transaction begins with the first executable SQL statement. A transaction ends when it is committed or rolled back.</blockquote>
+        <p>
+          When your application opens a connection and sends a SQL statement, you have started a transaction that can be rolled back at any time until you close the connection. In other words, I am already using transactions. Oracle&#39;s behavior surprised me a little because on SQL Server you have to explicitly use the <code>BEGIN TRANSACTION</code> statement to start one. MSDN confirms SQL Server&#39;s default nature for transactions.</p>
+        <blockquote>
+          Using the default SQL Server Native Client OLE DB provider autocommit mode, a single unit of work is treated as the scope of a local transaction. Only one unit participates in the local transaction.</blockquote>
+        <p>
+          That means one SQL statement per transaction. However, it does sound like it&#39;s an option that you can change via a provider setting.</p>
+        <p>
+          While this is an interesting sidetrack into transactions and how they differ between Oracle and SQL Server, the takeaway is that they will not speed up bulk <code>INSERT</code> statements.</p>
+        <h2>
+          The big string</h2>
+        <p>
+          27,000 rows is not a lot. If all of the data were on my machine as a CSV or any other format, a performant method of inserting is to build a single string containing 27,000 <code>INSERT</code> statements with all data and send it in one blast to Oracle. I tend to break things up a bit and would likely create 270 or so database commands each containing about one thousand <code>INSERT</code> statements. I do not know for sure if that is faster or better but I can at least track progress to the console.</p>
+        <p>
+          Most resources and articles I have found about improving data insert expect that you already have your data and all you want to do is insert it. I am getting my data from the Oracle server. I could in theory not issue an <code>INSERT</code> statement after generating each row and instead just append the SQL text to a string. Before I get into messing with my working application though, I want to check something.</p>
+        <h2>
+          Where&#39;s the issue?</h2>
+        <p>
+          With some profiling code in place, it becomes obvious that the <code>INSERT</code> statements are not the heart of the problem. The time sync is in building up the new row data by selecting and calculating across many other tables.</p>
+        <p>
+          My original plan for this article was specific to the bulk inserting of data.</p>
+        <h2>
+          All for one</h2>
+        <p>
+          Oracle supports server-side collections. You can build a collection of rows inside a stored procedure and
+        </p>
+        <h2>
+          Round trip</h2>
+        <h2>
+          Miscellania</h2>
+        <p>
+          Since I am an Oracle noob, I wanted to share a few small tips I sumbled upon while looking into speed improvements.</p>
+        <h3>
+          Table definitions</h3>
+        <p>
+          In SQL*Plus, Oracle&#39;s console tool, you can type <code>desc <em>MYTABLENAME</em></code> to spit out the table&#39;s definition. I find this very simple and useful. If I remember correctly, you need to query a master table in SQL Server to get that information.</p>
+        <h3>
+          SQL*Plus column sizing</h3>
+        <p>
+          Querying for data in a console can be quick but ugly.</p>
+        <p>
+          It&#39;s quick because without opening a huge software package you can open a command prompt, type <code>sqlplus MYUSER@MYSERVER</code>, login and begin issuing SQL. It&#39;s ugly because your console defaults to eighty characters wide and SQL*Plus defaults to using as much space per column as the column defines. Between wrapping and re-headering, your output is a mess.</p>
+        <p>
+          Use the following SQL*Plus syntax example to change the width of character-based MYCHARCOL to 20 and number-based MYNUMCOL to 9 for the duration of your SQL*Plus session.</p>
+        <code><pre>col MYCHARCOL format a20
+col MYNUMCOL format 9999999999</pre></code>
+        <p>There are plenty more SQL*Plus tips in PSOUG&#39;s reference here: <a href="http://www.psoug.org/reference/sqlplus.html">http://www.psoug.org/reference/sqlplus.html</a>.</p>
+        <h3>
+          Quick delete</h3>
+        <p>
+          My application runs every night and updates a flat table based on lots of data from many other tables. The first thing I have to do is clear the old data. Obviously <code>DELETE FROM <em>MYTABLENAME</em></code> works fine but according to the Oracle community PSOUG.org, <code>TRUNCATE TABLE <em>MYTABLENAME</em></code> does the same and has far less overhead. The full story is here: <a href="http://www.psoug.org/reference/truncate.html">http://www.psoug.org/reference/truncate.html</a>. The big warning is that this method will commit whatever transaction you have open. Since this app empties a table and then fills it back up with a similar amount of data, I think I should add the <code>REUSE STORAGE</code> option.</p>
+        <p>
+          I would like to point out one large difference I found. <code>DELETE</code> will return the number of rows deleted to your .NET data provider. <code>TRUNCATE</code> returns -1.</p>
+        <code>
+          <pre>adapter.DeleteCommand = connection.CreateCommand();
+adapter.DeleteCommand.CommandText =
+  <span class="str">"TRUNCATE TABLE MYTABLENAME REUSE STORAGE"</span>;
+<span class="kwrd">int</span> numDeleted = adapter.DeleteCommand.ExecuteNonQuery();
+<span class="type">Trace</span>.WriteLine(<span class="type">String</span>.Format(<span class="str">"Deleted {0} old rows"</span>, numDeleted));</pre>
+        </code>
+        <p>
+          In the above snippet, ODP.NET (Oracle&#39;s ADO.NET client) sets <code>numDeleted</code> to -1.</p>
+        <h3>
+          Adapter query parameters</h3>
+        <p>
+          The colon character marks a parameter in an ODP.NET query. This is written all over the Internet but I wanted to jot it down here with a quick example in a web app.</p>
+        <code>
+          <pre><span class="kwrd">string</span> connectionString = WebConfigurationManager.ConnectionStrings
+  [<span class="str">"MyConnectionString"</span>].ConnectionString;
+<span class="type">OracleConnection</span> connection = <span class="kwrd">new</span> <span class="type">OracleConnection</span>(connectionString);
+connection.Open();
+
+<span class="type">OracleDataAdapter</span> adapter = <span class="kwrd">new</span> <span class="type">OracleDataAdapter</span>();
+adapter.SelectCommand = connection.CreateCommand();
+adapter.SelectCommand.CommandText =
+  <span class="str">"SELECT * FROM MYTABLENAME WHERE MYIDCOL = :MyId"</span>;
+adapter.SelectCommand.Parameters.Add(<span class="str">"MyId"</span>, 37);
+
+<span class="type">DataTable</span> myData = <span class="kwrd">new</span> <span class="type">DataTable</span>();
+adapter.Fill(myData);</pre>
+        </code>
+        <p style="color: #FF6600; background-color: #00FF00; font-weight: bold;">
+          Notes to delete</p>
+        <ul>
+          <li><a href="http://download.oracle.com/docs/cd/B19306_01/appdev.102/b14261/tuning.htm">http://download.oracle.com/docs/cd/B19306_01/appdev.102/b14261/tuning.htm</a> </li>
+          <li><a href="http://www.dba-oracle.com/oracle_news/news_plsql_forall_performance_insert.htm">http://www.dba-oracle.com/oracle_news/news_plsql_forall_performance_insert.htm</a> </li>
+          <li><a href="http://www.dba-oracle.com/t_optimize_insert_sql_performance.htm">http://www.dba-oracle.com/t_optimize_insert_sql_performance.htm</a> </li>
+          <li></li>
+        </ul>
+      </div>
+      <div id="tags">
+        <ul>
+          <li><a href="http://twitter.com/#search?q=%23">Oracle</a></li>
+        </ul>
+      </div>
+      <div id="comments">
+        <h2>
+          Comments</h2>
+        <form action="comment.php" method="post">
+        <table>
+          <tbody>
+            <tr>
+              <th>
+                <label for="commentDisplayName">
+                  Name</label>
+              </th>
+              <td>
+                <input type="text" id="commentDisplayName" name="displayName" size="32" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <label for="commentWebsite">
+                  URL</label>
+              </th>
+              <td>
+                <input type="text" id="commentWebsite" name="website" size="32" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                <label for="commentText">
+                  Comment</label>
+              </th>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <textarea id="commentText" name="comment" rows="5" cols="36"></textarea>
+              </td>
+            </tr>
+            <tr>
+              <td id="commentCommands" colspan="2">
+                <input type="hidden" id="commentEntry" name="entry" />
+                <input type="submit" id="commentSend" value="Send" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.3.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(function() {
+      $("#commentEntry").val(window.location.href);
+    });
+  </script>
+
+</body>
+</html>

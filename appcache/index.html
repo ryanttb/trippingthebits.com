@@ -1,0 +1,397 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>appcache + jQuery Mobile - a case study</title>
+
+  <meta name="description" content="Researching appcache and html 5">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="../styles/default.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="identity">
+    <a href="../index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>appcache</h1>
+        <time>2011-12-08</time>
+        <p>For a current project at work, I am adding offline support to a mobile web app. I'm very excited about this as I haven't worked with HTML5's offline support yet. This is an attempt to take notes about my experience.</p>
+        <p>Before I begin, there are two things specific to this project that might be different from your own offline attempts. For one, as is common here at <a href="http://www.appgeo.com">Applied Geographics</a>, this project uses a map widget which references map tiles that are stored external to the website. Secondly, while there is very little server-side code, this website is hosted on IIS 7 which is common for our clients. That said, if I find myself writing something IIS-specific, I will try to also mention the Apache way.</p>
+        <p>Let's dive in!</p>
+        <h2>Initial environment</h2>
+        <p>The original site uses a .NET backend to connect to Oracle. It exposes functionality through web services. The frontend is 100% HTML and JavaScript using <a href="http://jquerymobile.com">jQuery Mobile</a> and <a href="http://jquerygeo.com">jQuery Geo</a>. The website is behind cookie-based authentication.</p>
+        <p>Users of the site can sign in to collect location and other information about features. In this context, a feature is a point on a map. The type of other information collected depends on how an admin configured the app. Since that's not important to adding offline support, I won't get into how these collection apps are configured.</p> 
+        <h2>Plan</h2>
+        <h3>design</h3>
+        <p>The difference in user experience we have designed for this app is that when an update attempt fails due to lack of Internet connection, the collection app will cache the update request. If there are any cached update requests, a button on the app's home screen should allow the user to re-attempt all updates. Apart from handling failed update requests, <b>the app itself should continue to operate is if it were online.</b></p>
+        <h3>changes</h3>
+        <p>From the introductory knowledge I have about offline HTML5 I can form a rudimentary plan for what I need to do on the tech-side to add offline support.</p>
+        <ul>
+          <li>appcache &ndash; I need an appcache file in which to list all the files that should be cached and what to do when the user loses his or her connection</li>
+          <li>session storage &ndash; failed update requests will be stored using <a href="../webstorage/">HTML5 web storage</a> so they can be attempted later</li>
+        </ul>
+        <p>This post will concentrate on the first part, appcache, which I know almost nothing about.</p>
+        <h3>gotchas</h3>
+        <p>Also from my introductory knowledge, I can guess at some issues I might have implementing this.</p>
+        <ul>
+          <li>jQuery Mobile's hijax &ndash; jQuery Mobile doesn't load pages normally, it intercepts link clicks, pulls in the page with magic and visually slides the page into view; how will this affect the appcache?</li>
+          <li>map tiles &ndash; map widgets pull tiles from external services and I have heard that using any external file breaks the cache and the site operates as if it weren't cached; is that true?</li>
+          <li>web services &ndash; the web app issues POST/PUT/DELETE requests to local web services; will this break the cache?</li>
+          <li>authentication &ndash; the browser will not initially be able to download files in the appcache; will things be ok after login?</li>
+        </ul>
+        <h3>other questions</h3>
+        <ul>
+          <li>single file &ndash; jQuery Mobile allows all pages to be in a single HTML file to be referenced by id; do I need to do this to use offline support?</li>
+          <li>ajax &ndash; I'm curious about ajax calls in general; how are web service calls supposed to work with offline support when they are not static files?</li>
+          <li>test &ndash; what's the best way to test that the cache is successfully being used?</li>
+        </ul>
+        <h2>Support</h2>
+        <p>I will be testing on these mobile devices only: Apple iPod Touch 4, Apple iPad 2, HTC Droid Incredible 2, Motorola Droid Bionic.</p>
+        <h2>Appcache</h2>
+        <p>One resource I found especially helpful in constructing this case study is <a href="http://www.sitepoint.com/offline-browsing-in-html5-with-applicationcache/">Offline Browsing in HTML5 with ApplicationCache</a> by Malcolm Sheridan. It appears to be a good introduction to the appcache file and I'm going to use it for initial suggestions.</p>
+        <h3>manifest reference</h3>
+        <p>There is a manifest file which needs an appcache extension. I'm going to name mine &quot;col.appcache&quot; to match other names in this collection app. You have to reference the manifest file from the html element of every HTML page.</p>
+        <blockquote>The catch is that this <b>must be included on every page</b>. If the reference isn't there, the browser won't cache the page.</blockquote>
+        <p>I assume that means all HTML pages even if they're pulled in by jQuery Mobile. Without even having an appcache file yet, I'm going to go ahead and add the reference to all my html pages.</p>
+        <pre><code>&lt;html manifest=&quot;col.appcache&quot;&gt;</code></pre>
+        <p>I have not added it to the only ASPX page, login.aspx, which does have an html element. My assumption is that this page isn't part of the cache. My hope is that once the user logs in, they will get to index.html and all the supporting JavaScript, image, and CSS files that are part of the cache, and all will be well.</p>
+        <p>I also have obviously not added the reference to any web service files, which don't have html elements (or any elements at all, because they return JSON).</p>
+        <h3>mime</h3>
+        <p>Next up, I have to make sure the web server returns the MIME type as: text/cache-manifest. The blog post I referenced shows how to do this through IIS 7's GUI. The nice thing about IIS 7 over previous releases is that, finally (!), it's entirely configurable through the static web.config file. Changing the MIME Types setting in IIS 7 is the same as adding the following to your system.webServer section:</p>
+        <pre><code>&lt;system.webServer&gt;
+  &lt;staticContent&gt;
+    &lt;mimeMap fileExtension=&quot;.appcache&quot; mimeType=&quot;text/cache-manifest&quot; /&gt;
+  &lt;staticContent&gt;
+&lt;/system.webServer&gt;</code></pre>
+        <p>You can add the MIME type to Apache by editing the .htaccess file and adding this line (if it doesn't already exist):</p>
+        <pre>AddType text/cache-manifest            appcache</pre>
+        <h3>result</h3>
+        <p>I can immediately tell that the appcache is doing <i>something</i> because after I sign in with Chrome it prints, &quot;Application Cache Error event: Manifest fetch failed (404) http://localhost/mdf/col.appcache&quot; to the console.</p>
+        <h2>Manifest file</h2>
+        <p>Again, I refer you to the blog post linked above for a great introduction to the structure of this file. I'm going to follow along and write down my thoughts.</p>
+        <h3>header</h3>
+        <p>The first line has to be:</p>
+        <pre>CACHE MANIFEST</pre>
+        <p>Easy enough. Next, he recommends a date stamp that you can change to force the browsers to completely refresh all the cached files. He does this with a date stamp in a comment, a pattern I will follow.</p>
+        <pre># 2011-11-29</pre>
+        <p>When I update the website files in any way, I will update this comment even if I'm not adding or removing whole files.</p>
+        <h3>cache</h3>
+        <p>The CACHE section lists every static file we want in the appcache. My website has:</p>
+        <ul>
+          <li>6 html files</li>
+          <li>7 static js files</li>
+          <li>1 <i>static</i> ashx file that returns JavaScript specific to this collection app configuration</li>
+          <li>2 css files</li>
+          <li>5 png files</li>
+        </ul>
+        <p>The remaining files are REST web service endpoints, the login page or server-side code.</p> 
+        <p>I know I should compile some of the JavaScript files into one file but the project is not complete enough for that sort of optimization. In other words, I'm feeling lazy.</p>
+        <p>My first real question: should I include favicon.ico and apple-touch-icon.png as static files? I do actually reference them in the html files. I'm going to leave them out for now.</p>
+        <pre>CACHE:
+401.html
+404.html
+featinfo.html
+index.html
+locmap.html
+notsupported.html
+Context.ashx
+js/col.js
+js/jquery.geo-test.min.js
+js/jquery.mobile-1.0.min.js
+js/jquery.webStorage.min.js
+js/jquery-1.6.4.min.js
+js/json2.min.js
+js/proj.min.js
+css/jquery.mobile-1.0.min.css
+css/style.css
+css/images/ajax-loader.png
+css/images/icons-18-black.png
+css/images/icons-18-white.png
+css/images/icons-36-black.png
+css/images/icons-36-white.png</pre>
+        <h3>network</h3>
+        <p>Next up, the NETWORK section which:</p>
+        <blockquote>defines which resources requires the user to be online</blockquote>
+        <p>Ah! This is where I put my REST endpoints. That makes sense. However, it raises my second real question. I don't want REST requests to fail behind the scenes if the user isn't online. The stated design is that, when not online, the failed update request will be cached to be attempted later. I'm hoping that by using the regular jQuery $.ajax function, I will still get the error callback, at which point I can cache the original update request myself.</p>
+        <p>I have three REST endpoints for this website.</p>
+        <pre>NETWORK:
+GlobalData.ashx
+MobileFramework.ashx
+MobileFrameworkData.svc</pre>
+        <p>The two ashx files are generic HTTP handlers that return JSON data based on GET or POST requests. These are no different than, say, a php file doing the same. The svc file is a .NET WCF Data Service which wraps an Object-Relational Model (ORM) that connects to the client's Oracle database. In the end, though, it accepts HTTP requests and returns JSON data like anything else.</p>
+        <p>Malcolm also lists login.aspx in the NETWORK section. I'm likely wrong about this but I'm going to stick with my initial plan to leave the login page out of the cache. The file is self-contained and, as I see it, a barrier to the application as a whole. I don't want the browser to attempt to download the files listed in the manifest if it doesn't have access to do so.</p>
+        <h3>fallback</h3>
+        <p>I can't entirely picture how this works. The theory is that if a file or image is missing we can specify replacements here. However, all my static files are in the cache, so why would they be missing? It must be for items included in the NETWORK section. Since all of my NETWORK items currently return JSON, I suppose I can have an empty JSON object (or just the keyword: null) in a static file and use that as a fallback. This is something I will look into later.</p>
+        <h3>map tiles</h3>
+        <p>Malcolm's blog post doesn't mention external resources so I went looking around the Internet and found <a href="http://appcachefacts.info/">Appcache Facts</a>. The third fact listed explains the sections a little more and says this about NETWORK:</p>
+        <blockquote>If you want to allow arbitrary URLs to be accessed (scripts, stylesheets, API calls, anything), include *, http://* and https://* in this section.</blockquote>
+        <p>That sounds like my answer. I should put the root of the map tile URLs here with a * at the end.</p>
+        <pre>http://tile.openstreetmap.org/*</pre>
+        <p>I am a little suspicious that I need to put exactly the three URLs mentioned. I hope specifying an external domain is correct. We shall see. Also, I can maybe put an empty tile image in the FALLBACK section for when the user is offline but goes to the map page.</p>
+        <h3>ssl</h3>
+        <p>The fourth Appcache Fact talks about SSL.</p>
+        <blockquote>Over SSL, all resources in the manifest must respect the same-origin policy</blockquote>
+        <p>I can't get into this now because the client doesn't have SSL enabled on the server. However, they do plan to publish the site over SSL. This will cause a problem because the map tiles will likely be on a different subdomain. I'll cross that bridge when I have to and try to come back and write about it.</p>
+        <h3>roll out</h3>
+        <p>That's my full appcache file. I'm ready for my first test.</p>
+        <h2>Chrome</h2>
+        <h3>login page</h3>
+        <p>I typed in the app's URL and was taken to the login screen. There's no mention of appcache in Chrome's console.</p>
+        <h3>first load</h3>
+        <p>After logging in, I get the following in Chrome's console:</p>
+        <pre>Document was loaded from Application Cache with manifest http://localhost/mdf/col.appcache
+Application Cache Checking event
+Application Cache Downloading event
+Application Cache Progress event (0 of 22) http://localhost/mdf/css/jquery.mobile-1.0.min.css
+Application Cache Progress event (1 of 22) http://localhost/mdf/js/jquery-1.6.4.min.js
+Application Cache Progress event (2 of 22) http://localhost/mdf/js/jquery.geo-test.min.js
+Application Cache Progress event (3 of 22) http://localhost/mdf/css/style.css
+Application Cache Progress event (4 of 22) http://localhost/mdf/js/jquery.webStorage.min.js
+Application Cache Progress event (5 of 22) http://localhost/mdf/js/json2.min.js
+Application Cache Progress event (6 of 22) http://localhost/mdf/js/proj.min.js
+Application Cache Progress event (7 of 22) http://localhost/mdf/js/col.js
+Application Cache Progress event (8 of 22) http://localhost/mdf/js/jquery.mobile-1.0.min.js
+Application Cache Progress event (9 of 22) http://localhost/mdf/401.html
+Application Cache Progress event (10 of 22) http://localhost/mdf/404.html
+Application Cache Progress event (11 of 22) http://localhost/mdf/css/images/icons-36-white.png
+Application Cache Progress event (12 of 22) http://localhost/mdf/featinfo.html
+Application Cache Progress event (13 of 22) http://localhost/mdf/notsupported.html
+Application Cache Progress event (14 of 22) http://localhost/mdf/index.html
+Application Cache Progress event (15 of 22) http://localhost/mdf/css/images/icons-36-black.png
+Application Cache Progress event (16 of 22) http://localhost/mdf/css/images/icons-18-black.png
+Application Cache Progress event (17 of 22) http://localhost/mdf/css/images/ajax-loader.png
+Application Cache Progress event (18 of 22) http://localhost/mdf/css/images/icons-18-white.png
+Application Cache Progress event (19 of 22) http://localhost/mdf/locmap.html
+Application Cache Progress event (20 of 22) http://localhost/mdf/?auth2
+Application Cache Progress event (21 of 22) http://localhost/mdf/Context.ashx
+Application Cache Progress event (22 of 22) 
+Application Cache UpdateReady event</pre>
+        <p>To me, that couldn't look more correct for a first attempt!</p>
+        <p>When I click on the Resources tab in Chrome's Developer Tools and expand the Application Cache node, I can click on the localhost item. The right panel fills with a list of all files from my cache. One file has Master as the Type, another file has Manifest, and the rest have Explicit. All web service calls are missing but they clearly worked because the app was able to query the database. The web service calls appear in the Network tab like usual.</p>
+        <p>I successfully added a new non-map feature to the database. I'll try mapping soon, but first...</p>
+        <h3>refresh</h3>
+        <p>I hit F5 and Chrome refreshed the app lightning quick. The console says:</p>
+        <pre><code>Document was loaded from Application Cache with manifest http://localhost/mdf/col.appcache
+Application Cache Checking event
+Application Cache NoUpdate event</code></pre>
+        <p>I wasn't expecting this part to work so smoothly!</p>
+        <h3>map</h3>
+        <p>Next I added a new feature, but this time clicked a button labeled &quot;Draw on Map&quot; that we have on the page which lets me place a point on a map. Chrome spit a bunch of these onto the console:</p>
+        <pre>x GET http://tile.openstreetmap.org/7/29/46.png</pre>
+        <p>Chrome didn't even request the tiles. There's no 404 status because there's no response at all. Clearly my last NETWORK section line isn't working as I had hoped. I'm going to swap it for the wildcard suggestion in Appcache Facts.</p>
+        <pre>*
+http://*</pre>
+        <p>Chrome updated the cache when I refreshed the browser. I tried to go to the map again but got the same result, no map tiles. Maybe it's placement in the appcache file. Since the wildcard will cover even my local web services, I'm going to comment them out and just have the wildcard lines.</p>
+        <pre>NETWORK:
+*
+http://*
+#GlobalData.ashx
+#MobileFramework.ashx
+#MobileFrameworkData.svc</pre>
+        <p>That worked! So much for being specific. However, I feel the correct way to do this (and the direction I think I will head) is to have a proxy handler to return map tiles. A setup like that will also get me around the SSL same-origin policy issue.</p>
+        <h3>proxy</h3>
+        <p>I wrote up a quick proxy file, GlobalMap.ashx, so that GlobalMap.ashx?/=/7/29/46.png returns the same image as http://tile.openstreetmap.org/7/29/46.png. Now I can put GlobalMap.ashx in my NETWORK section and remove the wildcards.</p>
+        <pre>NETWORK:
+GlobalData.ashx
+GlobalMap.ashx
+MobileFramework.ashx
+MobileFrameworkData.svc</pre>
+        <p>All is well this way and I feel better about it. The app is working...Time to pull the plug!</p>
+        <h3>offline</h3>
+        <p>I removed my network cable and refreshed the browser. The cached static files loaded fine and quickly. The first web service call failed as planned and jQuery called the ajax error callback. However, the first ajax call asks the web server for some extra information about this specific collection app. In my error callback I forward the user to 404.html. This is not ideal for an app that should seamlessly stay functional in a temporary offline situation.</p>
+        <h3>edit a cached file</h3>
+        <p>I edited col.js, the main JavaScript file to not forward to 404.html if it has retrieved the extra app information at least once this session. Then I hit my second snag: Chrome won't load the updated col.js file no matter how many times I &quot;Empty the cache&quot;, update col.appcache, or refresh the browser. I can type the URL for the JavaScript file directly into the address bar and see the old, unchanged file.</p>
+        <p>It turns out, just having &quot;Empty the cache&quot; checked in the &quot;Clear browsing data&quot; dialog isn't enough. I don't know which one helped, but I checked all of the options and refreshed. Chrome grabbed the updated JavaScript file.</p>
+        <h3>offline for real</h3>
+        <p>With the new code, I again pulled the plug and the first page loaded fine. The first thing it attempts to do is query the database for a list of features already collected. This failed and jQuery called my error function. This couldn't be better as instead of just displaying an error I can now alert the user that he or she may have lost connectivity and will have to try again.</p>
+        <p>The real test is to try to add a new feature. I clicked the appropriate button and the new page slid in just as it would if I were online. The appcache worked, even when jQuery Mobile was hijaxing the page in!</p>
+        <p>I entered some information, not testing the map yet, and clicked Save. I got another error callback which is exactly what I wanted. As before, tell the user to try again in a minute.</p>
+        <p>After plugging the network cable back in, I clicked Save again. The data saved as normal and the app took me back to the feature list which showed the new feature and the old ones.</p>
+
+        <h2>HTC Incredible 2</h2>
+        <p>Seeing this work in a desktop browser helps determine if things are setup correctly. However, we need to test on real mobile devices to see how it will work for the client.</p>
+
+        <h3>first load</h3>
+        <p>I opened the default web browser on the HTC Incredible 2 and browsed to the collection app. There is no console to determine if everything is working as planned but the app functioned as normal: login page =&gt; feature list =&gt; feature info, etc.</p>
+
+        <h3>airplane</h3>
+        <p>Then I flipped the phone into airplane mode and went back to the browser. After refreshing, things started normally. The feature list page returned empty and the request for previously collected features failed. At the same time the browser alerted me, saying that I should enable some sort of connectivity. I tapped Cancel and went back to the app, which was not happy. When I tapped the New Feature button, jQuery Mobile failed to load the next page and alerted me with &quot;Error Loading Page&quot;, even though the HTML file is in the appcache I assume.</p>
+        <p>I turned airplane mode off and the app got into an odd state. I could refresh and get the list of previous features but attempts to view their info or create new features results in the same jQuery Mobile error notification as when offline. As it turns out, this does not seem to be realted to the app's connectivity. <b>The issue appears to be between appcache on Android and the way jQuery Mobile loads pages.</b> If I were to guess I'd say it has something to do with the login page not being part of the cache but existing on the same directory. Further, and I'm still guessing here, I think leaving the appcached site in any way will cause a jQuery Mobile request to another page in the cache to fail. I would like to test this without AJAX or jQuery Mobile but I don't have time to set that up at the moment.</p>
+        <h3>Android &amp; appcache</h3>
+        <p>I felt the need to test what I did have more. I killed the Internet app, launched again and cleared the browser cache before logging in. At this point the web app functioned fine. I could view existing feature data and add new features. I tapped the sign out button and then signed back in. <b>Without ever having been offline, jQuery Mobile was no longer able to load the secondary pages.</b> I'm not claiming this as an issue with jQuery Mobile, which is only requesting the page from the browser. The browser is not supplying the requested page from the cache. However, it may be something the team would want to look into for potential workarounds.</p>
+        <p>To give my hypothesis a bit more evidence, I made an exact copy of the website. In the copy, I removed the manifest attribute from the html element of every page and deleted the col.appcache file. After browsing to this new site and following the steps above, the jQuery Mobile app worked perfectly on Android. I can sign out and in as much as I want and still edit features.</p> 
+        <p>This unfortunate behavior might drive me to merge all jQuery Mobile pages into a single HTML file, index.html, which I am able to view even when loading other pages fails.</p>
+
+        <h3>true offline test</h3>
+        <p>Believing that there's some issue with exiting and then returning to the site, I wanted to test appcache as properly as I could. This meant I had to lose connectivity naturally. Also, to make sure no external forces interfered, I wanted to keep the Internet app running, i.e., without switching to other apps (even Settings). I performed my test while riding the MBTA Red Line.</p>
+        <p>After clearing the Internet app's cache, I browsed to the web app above ground &amp; waited to lose wireless deep under Central Square. At that point, I tapped New Feature and in slid the data entry page. The page was in the cache, and I could access it. Attempting to save a new feature failed, as expected. When I regained connectivity, I could save. This was a good test, but didn't change the fact that the app would no longer work if the user opened another app.</p>
+
+        <h3>first conclusion</h3>
+        <p>I don't know where this leaves me. Appcache with multiple pages and jQuery Mobile works fine on Android unless you leave the app? I will test on other Android devices as Android web browsers all seem to work slightly different.</p>
+
+        <h2>iPod Touch 4</h2>
+        <p>Next up, an iPod Touch 4, with iOS 4. This device is WiFi-only. I opened Safari Mobile and browsed to the web app. It functioned fine so I turned off WiFi in Settings. I tapped the New Feature button and the empty data entry page slid in. Like Chrome, I got an error trying to save this way but re-enabling WiFi and tapping Save again worked as usual.</p>
+        <p>Once back to the feature list page, I tapped the sign out button. After reauthenticating, I could access the feature list and view feature details.</p>
+        <p>Mobile Safari appeared to be working well until I tapped the browser's refresh icon. I had actually tested Mobile Safari with older versions of the app, and (to my surprise), an older version of the feature list page appeared. Clearing the cache in Settings didn't help&ndash;refresh always shows the old version.</p>
+        <p>Searching for this issue online led me to this post: <a href="http://www.genuitec.com/support-mobione/viewtopic.php?t=2096">http://www.genuitec.com/support-mobione/viewtopic.php?t=2096</a> on the MobiOne support forum. It says nothing less than iOS 4 doesn't clear the appcache unless you clear the browser cache and then <b>shut the phone off.</b> Oops! After following those steps, I could tell the cache was truly cleared, after which I got the updated page.</p>
+        <p>I haven't tested on iOS 5 but will provide an update when I can.</p>
+
+        <h2>Redesign</h2>
+        <p>I needed to fix the code for Android and decided to merge all of the pages into one. My hope was that the roadblock was only the way pages were requested in jQuery Mobile; requests for other static files such as JavaScript and CSS were fine.</p>
+        <p>Also, having run through the app a bunch of times and become more familiar with appcache, I decided to try a couple other changes:</p>
+        <ul>
+          <li>add login.aspx to the app cache</li>
+          <li>allow anonymous access to all static files; security will be done at the web service level</li>
+        </ul>
+        <h3>single page</h3>
+        <p>This change was easy. First, I copied the data-role=&quot;page&quot; divs from featinfo.html and locmap.html into index.html. I also removed the two files from the col.appcache manifest. The only thing that remained was that anywhere I referenced an HTML file in a link, I had to change it to use an id. For example, the New Feature button on the main page was: <pre><code>&lt;a href=&quot;featinfo.html&quot; data-role=&quot;button&quot; data-icon=&quot;plus&quot;&gt;New Feature&lt;/a&gt;</code></pre> and I had to change the href to: <pre><code>href=&quot;#featinfo&quot;</code></pre> which matches the jQuery Mobile page's id: <pre><code>&lt;div id=&quot;featinfo&quot; data-role=&quot;page&quot; data-theme=&quot;b&quot;&gt;</code></pre></p>
+        <p>After these changes, I did some quick tests in Chrome and all seemed well. It was actually a little more responsive because the feature info page was already loaded in jQuery Mobile, it didn't have to hijax in a new physical page. Sure, the page was in appcache but there's overhead of having jQuery Mobile request the page.</p>
+        <h3>login page</h3>
+        <p>I'm now following Malcom's blog post's suggestion of adding the login page to the appcache. I get the feeling that these apps should be all or nothing in that every resource that could possibly be requested should be in the manifest somewhere. Since you can't sign in without being online, login.aspx goes in the NETWORK section. I also had to add the manifest reference to the login page's html element. Lastly, I allowed anonymous access to all static pages (pages in the CACHE section of the manifest) so that browsers can get to them right away. Back to Chrome for some tests.</p>
+        <p>As expected, Chrome now tries to load the whole cache when it gets to the login page. However, loading the appcache failed with a couple of these:</p>
+        <pre>x GET WebResource.axd?xxxxxxxxxxxxxxxxx</pre>
+        <p>Heh, ASP.NET. So, when ASP.NET preparses an ASPX page, it inserts references to core ASP.NET JavaScript. These references all come from a special address: WebResource.axd. This URL doesn't exist as a physical file in the website but the browser will look for it anyway when building the appcache. I had to add this HTTP resource to the NETWORK section of the manifest file.</p>
+        <p>With this last change in place, the full appcache loaded fine.</p>
+        <h3>manifest</h3>
+        <p>For folks playing along at home, my full manifest file looks like this now.</p>
+        <pre>CACHE MANIFEST
+# 2011-12-03
+CACHE:
+401.html
+404.html
+index.html
+notsupported.html
+Context.ashx
+js/col.js
+js/jquery.geo-test.min.js
+js/jquery.mobile-1.0.min.js
+js/jquery.webStorage.min.js
+js/jquery-1.6.4.min.js
+js/json2.min.js
+js/proj.min.js
+css/jquery.mobile-1.0.min.css
+css/style.css
+css/images/ajax-loader.png
+css/images/icons-18-black.png
+css/images/icons-18-white.png
+css/images/icons-36-black.png
+css/images/icons-36-white.png
+NETWORK:
+login.aspx
+GlobalData.ashx
+GlobalMap.ashx
+MobileFramework.ashx
+MobileFrameworkData.svc
+WebResource.axd</pre>
+        <h3>mobile</h3>
+        <p>I tested this new design with both the Droid and iPod. In short, they both worked perfectly. I can sign in and out while online without issues. I can get to the New Feature page while in airplane mode. Also, the extra responsiveness of not hijaxing in new pages is even more apparent on mobile. If you plan on using appcache and jQuery Mobile, I recommend having only one HTML page.</p>
+        <h2>Offline map</h2>
+        <p>My last task directly related to appcache is handling the map. I need to display <i>something</i> when the user moves to the map page but can't get to map tiles. I'm pretty sure this is where the FALLBACK section of the appcache comes into play. The format of lines in the FALLBACK section is: <i>resource</i> <i>fallback file</i>.</p>
+        <p>Since I have a proxy for map tiles, I can target that proxy specifically. All the tiles are 256x256 pixel squares. I made an image of that size with some text about having lost connection temporarily and added the following to col.appcache.</p>
+        <pre>FALLBACK:
+GlobalMap.ashx img/missing-tile.png</pre>
+        <h3>mobile</h3>
+        <p>This part worked great on both of my test devices!</p>
+        <p>For the HTC Android, I started on WiFi and browsed to the map page. On the map page, the user can tap to select a point location for the feature. The map came up as expected. I tapped the browser's back button, and then shut off the wireless router. Re-entering the map page showed map tiles as normal&ndash;I assume they're coming from the regular browser image cache. Panning the map kept the old tiles in place and my fallback image appeared for every new tile request...until the 3G connection kicked in. At that point, I started to get real tiles again.</p>
+        <p>The iPod Touch worked about the same except that there were no cached images when I went back to the map page after shutting WiFi off. I immediately got a full screen of missing tile images. While not ideal, it is functional.</p>
+        <p>I can think of only one potential problem: what if the browser caches the missing tile image as the real tile? When the user has a connection again, will they still get the missing tile image?</p>
+        <h3>airplane</h3>
+        <p>Testing appcache by putting the phone on airplane mode is less accurate to the real-world environment for the app but I wanted to try it anyway. As it turns out, the Android browser operates quite differently in airplane mode than it does after losing connection naturally. For example, I can tap the &quot;Draw on Map&quot; button and the map page slides in. However, while the map page's header looks fine, I don't get either real map tiles or the fallback image in the map widget itself. It's as if the browser returns 404 to all GlobalMap.ashx requests. Stranger still, the map page doesn't go away when I tap the back button. The URL changes, but the empty map page stays. I had to manually tap refresh to see the feature info page.</p>
+        <p>The iPod operated normally when I put it in airplane mode. I got all missing tile images and was still able to select a point and use the back button.</p>
+        <p>I'm glad I tested airplane mode again. I at least learned that Android behaves oddly. This does not feel like it will affect real-world usage of the app.</p>
+        <h2>Round trip</h2>
+        <h3>conclusions</h3>
+        <p>Appcache is an excellent new tool in web your development pocket. It has development quirks and implementation issues on mobile devices but adding it is well worth the effort. I hope this stream-of-consciousness post helps a few people. Have fun!</p>
+        <ul>
+          <li>Appcache is fast, not too hard to setup, and works mostly <i>great</i>!</li>
+          <li>As of this writing, if you are using jQuery Mobile, I recommend rolling all your pages into a single, cached HTML page for Android support.</li>
+          <li>iOS 4 doesn't properly clear the appcache; point users to <a href="http://apps.ft.com/ftwebapp/troubleshooting.html">http://apps.ft.com/ftwebapp/troubleshooting.html</a>.</li>
+          <li>In spite of my initial thoughts, all resources should be included in the appcache in either the CACHE or NETWORK section.</li>
+          <li>If you are using ASP.NET and you add any ASPX page to the manifest, e.g., a login page, <b>also</b> add WebResource.axd to the NETWORK section.</li>
+          <li>The FALLBACK section is perfect for missing map tiles.</li>
+        </ul>
+        <h3>references</h3>
+        <ul>
+          <li><a href="http://www.sitepoint.com/offline-browsing-in-html5-with-applicationcache/">Offline Browsing in HTML5 with ApplicationCache</a></li>
+          <li><a href="http://appcachefacts.info/">Appcache Facts</a></li>
+          <li><a href="http://www.genuitec.com/support-mobione/viewtopic.php?t=2096">http://www.genuitec.com/support-mobione/viewtopic.php?t=2096</a></li>
+        </ul>
+      </div>
+      <div id="tags">
+        <ul>
+          <li>
+            <a href="http://twitter.com/#search?q=appcache%20html5">appcache html5 on Twitter</a>
+          </li>
+        </ul>
+      </div>
+
+      <h2>Share</h2>
+
+      <ul id="share">
+        <li><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="ryanttb">Tweet</a></li>
+        <li><g:plusone annotation="inline"></g:plusone></li>
+        <li><div class="fb-like" data-send="false" data-width="256" data-show-faces="false"></div></li>
+      </ul>
+
+      <div id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.6.4.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript" src="//platform.twitter.com/widgets.js"></script>
+
+  <script type="text/javascript">
+    (function() {
+      var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+      po.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+    })();
+  </script>
+
+  <div id="fb-root"></div>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));</script>
+  
+  <script type="text/javascript">
+    var disqus_shortname = 'trippingthebits';
+    var disqus_identifier = 'ttb_appcache';
+    var disqus_url = 'http://trippingthebits.com/appcache/';
+
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26113662-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s)
+    } (document, 'script'));
+  </script>
+</body>
+</html>

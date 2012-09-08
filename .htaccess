@@ -1,0 +1,5 @@
+AddType text/cache-manifest            appcache
+
+AddOutputFilterByType DEFLATE application/javascript
+AddOutputFilterByType DEFLATE application/json
+

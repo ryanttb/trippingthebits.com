@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>SpecLibs!</title>
+  <link href="../../styles/default.css" rel="stylesheet" type="text/css" />
+  <style type="text/css">
+    .apiTerm
+    {
+      color: #FF4500;
+      font-family: Courier New;
+    }
+  </style>
+</head>
+<body>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          SpecLibs!</h1>
+        <p>
+          Thank you for contributing to W3C&#39;s web storage specification. You can read the current editor&#39;s draft below.</p>
+        <h2>
+          Abstract</h2>
+        <p>
+          This specification defines an API for <span data-text="storing">persistent data storage of</span> <span data-text="data">data</span> in Web clients.
+        </p>
+        <h2>
+          Introduction</h2>
+        <p>
+          This specification introduces two related mechanisms, similar to <span data-text="cookies">HTTP session cookies</span>, for storing structured <span data-text="data">data</span> on the client side.
+        </p>
+        <p>
+          The first is designed for scenarios where the user is <span data-text="carryingOut">carrying out a single transaction</span>, but could be <span data-text="carryingOut">carrying out multiple transactions</span> in different windows at the same time. <span data-text="cookies" style="text-transform: capitalize;">Cookies</span> don't really handle this case well.
+        </p>
+        <p>
+          The second is designed for a <span data-text="storage">storage</span> that spans multiple windows, and lasts beyond <span data-text="time">the current session</span>. Again, <span data-text="cookies">cookies</span> do not handle this case well, because they are transmitted with every <span data-text="request">request</span>.
+        </p>
+        <h2>
+          The API</h2>
+        <p>
+          Each <span data-text="storage">storage</span> object provides access to a list of <span data-text="key">key</span>/value pairs. A <span data-text="key">key</span>/value pair is sometimes called: <span data-text="item">item</span>. Any <span data-text="string">string</span> is a valid <span data-text="key">key</span>. Values can be any <span data-text="dataType">data type</span> supported by the structured clone algorithm.
+        </p>
+        <p>
+          The <span class="apiTerm">get<span data-text="item" style="text-transform: capitalize;">Item</span>(<span data-text="key">key</span>)</span> method must return a structured clone of the current <span data-text="dataType">value</span> associated with the given <span data-text="key">key</span>.
+        </p>
+        <p>
+          The <span class="apiTerm">set<span data-text="item" style="text-transform: capitalize;">Item</span>(<span data-text="key">key</span>, value)</span> method must first create a structured clone of the given <span data-text="dataType">value</span>. If constructing the stuctured clone would involve constructing a new <span data-text="imageData">ImageData object</span>, then throw a <span class="apiTerm">NOT_SUPPORTED_ERR</span> exception instead.
+        </p>
+        <p>
+          The <span data-text="storageEvent" class="apiTerm">storage</span> event is fired when a storage area changes. Since the <span data-text="storageEvent" class="apiTerm">storage</span> event can execute in multiple browsing contexts simultaneously, it is not <span data-text="thread">thread</span>-safe and should not be triggered other than other than in a way that is predictable by <span data-text="script">script</span>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(function() {
+      function dataBind() {
+        $("[data-text]").each(function() {
+          var $this = $(this);
+          $this.text(window.localStorage.getItem($this.attr("data-text")));
+        });
+      }
+
+      if ("localStorage" in window) {
+        // IE8
+        $(document).bind("storage", dataBind);
+        // Chrome/Safari
+        $(window).bind("storage", dataBind);
+        
+        dataBind();
+      }
+    });
+  </script>
+
+</body>
+</html>

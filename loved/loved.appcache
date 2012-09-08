@@ -1,0 +1,17 @@
+CACHE MANIFEST
+# 2012-02-14
+
+CACHE:
+index.html
+css/style.css
+img/ajax-loader.gif
+img/heart.png
+js/jquery-1.7.1.min.js
+js/jquery.geo-test.min.js
+
+NETWORK:
+http://tile.openstreetmap.org/
+
+FALLBACK:
+http://tile.openstreetmap.org/ img/offline-tile.png
+

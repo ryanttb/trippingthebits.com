@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>OpenLayers</title>
+  <link href="../styles/default.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="identity">
+    <a href="../index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a> <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          Open GIS</h1>
+        <time>2010-06-30</time>
+        <p>
+          We have a client asking for an open-source mapping solution which means I finally have an official reason to dig into GeoServer, OpenLayers and Web Map Services (WMS). This article is primarilly about programming with OpenLayers, a bit about WMS and less about GeoServer.</p>
+        <h2>
+          OpenLayers</h2>
+        <p>
+          OpenLayers (<a href="http://openlayers.org">http://openlayers.org</a>) is a library for connecting to map services and displaying map data line. It is open-source and written 100% in JavaScript. While you can download the library as a single, minified JavaScript file from their website it is over 800k of code that you don&#39;t always need. Thankfully, Christian (<a href="http://twitter.com/spanaut">@spanaut</a>) alerted me to <a href="http://openlayerer.appspot.com">http://openlayerer.appspot.com</a> which allows you to pick and choose the parts of OpenLayers you want. I have written more about the parts you want further down.</p>
+        <h3>
+          UX</h3>
+        <p>
+          Various classes in the OpenLayers.Control namespace manage a user&#39;s interaction with the map. They don&#39;t entirely have to be visible, e.g., adding the Navigation control allows the user to pan the map with their mouse and zoom in with the mouse wheel.</p>
+        <h3>
+          Layers</h3>
+        <h2>
+          WMS Service URL</h2>
+        <p>
+          The most common layer type is Layer.WMS to connect OpenLayers to a web map service (WMS) such as GeoServer or MapServer.
+          You can find free web map services online. The references look something like</p>
+        <pre>http://host/path/to/wms/ServiceName?SERVICE=WMS&amp;REQUEST=GetCapabilities</pre>
+        <p>When you&#39;re creating your OpenLayers.Layer.WMS object you only need to pass up to, but not including, the question mark as your second parameter. Depending on the server, the ServiceName may end in .wms, .cgi or nothing at all as in the Metacarta server below.</p>
+        <p>If you type the full GetCapabilities reference into a web browser, you will get XML describing all of the <i>service layers</i> available. I say service layers to not confuse them with the layer objects you add to an OpenLayers map. Scan the capabilities XML for Name elements inside Layer elements to determine the names of your service layers. You can add any of these service layers as a comma-delimited list passed to the layers property of the WMS object.</p>
+        <code><pre>
+<span class="kwrd">var</span> mapService = <span class="kwrd">new</span> OpenLayers.Layer.WMS(
+  <span class="str">"Metacarta"</span>,
+  <span class="str">"http://labs.metacarta.com/wms/vmap0"</span>, {
+    format: <span class="str">"image/png"</span>,
+    layers: <span class="str">"basic,priroad,ctylabel"</span>,
+    tiled: <span class="str">"true"</span>
+  });</pre></code>
+        <h2>
+          Parameters vs. options</h2>
+        <p>
+          The third and forth arguments to Layer&#39;s constructor are parameters and options. This confused me at first but you can think of parameters (the third argument) as arguments sent to the service behind your layer where as options (the forth argument) are handled direcctly by the OpenLayers.Layer object.</p>
+        <h2>
+          Vector</h2>
+        <h2>
+          Styles</h2>
+        <h3>
+          WMS</h3>
+        <h3>
+          Vector</h3>
+        <h2>
+          Events</h2>
+        <p>
+          OpenLayers has its own event registration system. You can call Map.events.register on your Map object once created or register inline with the Map&#39;s constructor. I prefer the latter:</p>
+        <code><pre><span class="kwrd">var</span> map = <span class="kwrd">new</span> OpenLayers.Map(<span class="str">"map"</span>, {
+  eventListeners: {
+    <span class="str">"zoomend"</span>: function(e) {
+      <span class="rem">// zoomend</span>
+    }
+  }
+});</pre></code>
+        <p>
+          &nbsp;</p>
+        <h2>
+          Efficiency</h2>
+        <h3>
+          Requests</h3>
+        <p>
+          In my experience so far, OpenLayers requests more images from a tiled service than is necessary to fill the visible map at the current extent. For example, when you zoom in the browser will request 40 new images even if only 9-12 are required to refill the div. I am new to this library so I may have initialized something incorrectly.</p>
+        <p>
+          You can change this by modifying the buffer option when creating an OpenLayers.Layer.Grid object, of which WMS is a type.</p>
+        <h3>
+          Scaling</h3>
+        <p>
+          Modern JavaScript map engines such as Google, Bing and even ESRI&#39;s JavaScript API will scale existing tiles the moment you zoom in and draw the new, more detailed tiles on top. I have not found a way to get OpenLayers to do this yet.</p>
+        <h2>
+          Files</h2>
+        <h3>
+          Size</h3>
+        <p>
+          With only the base scripts, the WMS layer and the Navigation control, OpenLayers is 148k. That number increases as you add more functionality.</p>
+        <h3>
+          Resources</h3>
+        <p>
+          The minified version of OpenLayers expects the theme and img folders on the same location as the JavaScript file. I tend to create a folder for OpenLayers and put everything it needs in there even if it means that I have additional folders for my website&#39;s styles, images and script elsewhere.</p>
+        <h2>
+          Gotchas</h2>
+        <ul>
+          <li>Can&#39;t use OpenLayerer app to add Layer.Vector
+          <p>Even though your browser supports one of the four vector renderers, you will get a warning if you only add the Vector class to your smaller OpenLayers.js file.</p></li>
+        </ul>
+        <h2>
+          ~~~~~ Notes ~~~~~</h2>
+        <ul>
+          <li>UI - Don&#39;t include Popups</li>
+          <li>UI - Can I set the map to zoom mode without having a ZoomBox control</li>
+          <li>Layer - How tiled is it? When specified as a tiled Layer, I don&#39;t get the feeling it&#39;s asking for tiles from the server</li>
+          <li>Map - Max vs. current extent: I am having trouble achiving the view I want in tiled mode</li>
+          <li>Layer - WMS - How do I make a layer draw with a transparency?</li>
+          <li>WMS vs. WMTS vs. TMS</li>
+          <li>Not possible to limit extent of service layers</li>
+        </ul>
+        <h2>
+          Round trip</h2>
+      </div>
+      <div id="tags">
+        <ul>
+          <li><a href="http://twitter.com/#search?q=%23OpenLayers">OpenLayers</a> </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+  </script>
+
+</body>
+</html>

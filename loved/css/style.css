@@ -1,0 +1,46 @@
+﻿html
+{
+  font:13px/1.231 Calibri,Arial,sans-serif; *font-size:small;
+}
+
+.info 
+{
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: -4px 4px #444;
+  opacity: .8;
+  padding: 8px;
+  width: 95%;
+}
+
+#map
+{
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.heart
+{
+  width: 64px;
+  height: 64px;
+  position: absolute;
+  left: -28px;
+  top: -28px;
+  background-repeat: no-repeat;
+  background-image: url(../img/heart.png);
+}
+
+@media only screen and (min-width: 800px) 
+{  
+  .info
+  {
+    max-width: 45% !important;
+    position: absolute !important;
+    right: 16px;
+    top: 16px;
+  }
+}
+

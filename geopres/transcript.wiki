@@ -1,0 +1,290 @@
+==o hai==
+!! So, I thought this was the "expensive and closed source" conference for geospatial.
+!! but, ok...
+!! open source...
+!! I can do that.
+!! My name is Ryan and I'm a GIS web developer at AppGeo.
+
+!! I build a lot of mapping websites.
+!! Which is great because more people seem to want them nowadays.
+!! However, it can get pretty frustrating.
+
+==mapping y u no easy?===
+!! There are many ways to get maps onto your website.
+!! To me, though, it feels like the period following "plot some points"
+!! gets too complex too quickly. 
+
+!! In some APIs, even that task requires more typing than seems necessary.
+
+==who?==
+!! I'm sure I forgot a few but you can see that there is no shortage of players.
+
+==reference test==
+!! I decided to implement the same task in six of the mapping APIs I just listed.
+!! For each, I attempt to follow the best practices
+!! as documented by each API on their websites.
+
+!! When i write a new mapping website, I need to at least
+!! create a map,
+!! handle events
+!! and show points
+
+!! Which is what this task is doing.
+
+==what about?==
+!! These are details that all APIs must handle.
+!! How they implement them is different.
+!! Depending on how they're implemented, they can be sources of code bloat.
+
+** point with flat hand while saying each bullet
+
+* How much code do you have to type to show anything?
+* Do you have to wrap simple lon/lat values in objects?
+* How do you bind to a click event?
+* In your click handler, is the geometry of a clicked point included or do you have to call a function?
+* How many extra objects do you have to create to put a shape on the map?
+* Are there any other weird hurdles or extra typing required to get going?
+
+==mapquest==
+mapquest's version is very good.
+
+* IS a default map.
+* Location IS a plain object.
+* There is a manager for map events EXTERNAL to the widget.
+* Event CONTAINS clicked map location.
+* ONE new is required to add a shape: Poi
+
+==google==
+Google Maps is the most commonly used API for non-GIS developers.
+
+* NO LONGER a default map.
+* Location is NOT a plain object.
+* There is a manager for map events EXTERNAL to the widget.
+* Event CONTAINS clicked map location.
+* ONE new is required to add a shape: Marker
+* HOWEVER, you have to add the map to the shape (as opposed to adding the shape to the map) which can be confusing.
+
+** point out "weirdness" 
+
+==bing==
+bing isn't too bad either.
+
+* IS a default map.
+* Location is NOT a plain object.
+* Widget manages map events but NOT inline.
+* Event does NOT contain clicked map location.
+* TWO news required: shape and pixel.
+
+==ovi==
+Yahoo! no longer supports their Maps API and links to Ovi from Nokia.
+
+* IS a default map.
+* Location IS a simple array.
+* Widget manages map events inline.
+* Event does NOT contain clicked map location.
+* ONE new is required to add a shape.
+
+**** TEST OVI'S BEHAVIOR ****
+** as you can see there's some weirdness here
+* while there is a default, you have add a BEHAVIOR component for interactivity.
+** like, any interactivity, like panning or zooming. "otherwise it's just an image"
+* LASTLY, while most APIs have dropped developer keys, Ovi has not. 
+
+** these last four were generic web mapping APIs
+
+** no: warn that these next two are GIS
+** no: "now let's look at GIS-centric offerings"
+
+** "which means they don't have to deal with common mapping problems like" ** no: gis mapping means we have to deal with:
+** "projections, tiling schemes, multiple map servers, etc."
+
+** these next two APIs do deal with GIS problems
+** let's see what this does to the code ** no: amount of code we have to type
+
+==Esri==
+Esri
+
+** sigh
+
+Esri is a major player in the GIS world. ** remove: Instantly, we can see what GIS developers have to go through.
+
+* NO default map, you have to add one as a LAYER and you can't do it inline.
+* Location is NOT a plain object.
+* Location must also have a SPATIAL REFERENCE.
+* Dojo handles map events.
+* Event CONTAINS clicked map location.
+* TWO news are required to add a shape: graphic and point objects.
+** but you also have to create a new marker object
+ALSO, you have to pass a symbol object and a spatial reference.
+** spatial reference object for both adding shapes and setting locations
+
+==OpenLayers==
+** dramatic sigh
+
+OpenLayers is the only GIS-centric open source API that you may have used.
+
+* NO default map
+* You have to add a BASEMAP as well as a LAYER for points.
+* Location is NOT a plain object.
+* Event SYSTEM for map events with a custom Handle object.
+* Event does NOT contain clicked map location.
+* Have to call the BRUTALLY named getLonLatFromViewPortPx function.
+** Have to call the INTERESTINGLY named..pause..getLonLatFromViewPortPx function.
+* TWO news are required to add a shape: vector and point objects.
+
+==paradigm==
+!! The jQuery paradigm is, "write less, do more."
+!! We implement this with mapping, so,
+!! jQuery Geo's paradigm is "write less, map more"
+
+==jQuery Geo==
+!! This does everything the other examples do.
+
+* IS a default map.
+* Location IS a simple array.
+* jQuery handles map events INLINE.
+* Event CONTAINS the clicked map location.
+* ZERO news required.
+
+==dos equis==
+** pause
+
+==shape interaction==
+!! We've just seen how to add points.
+!! We also need to interact with them.
+
+!! In jQuery Geo, you do this with the map widget & other plugin functions.
+
+!! The shapes don't trigger their own events.
+!! You use the find method to perform a spatial query.
+
+!! The code here adds or removes a shape depending on whether or not
+!! one already exists at the click location.
+
+==gis ftw==
+!! So far jQuery Geo looks a lot like the other non-GIS APIs.
+
+!! However, there is full support for any mapping server and custom tiling schemes.
+
+!! Once you step outside the world of web mercator,
+!! you may need an object like this in the worst case
+!! but the rest of jQuery Geo works the same.
+
+==docs rage==
+!! Even while making the simple examples I showed previously,
+!! I got lost in some API docs.
+!! For example, handling click events in OpenLayers...
+
+** scroll up?
+
+!! The website says the demos are the "primary source of documentation"
+
+!! After looking through six demos,
+!! the best practices appear to be building a click handler control.
+!! that's this big yellow blob here
+
+!! With jQuery Geo, the documentation comes first.
+
+==lots-o-docs==
+!! Every function & property in jQuery Geo is well documented
+!! and has a focused example page before I make the feature public.
+
+!! Anything not in the docs is either not supported yet or by design.
+
+!! You should only dive into the project source code when you want to,
+!! never because you have to.
+
+==examples, demos & the showcase==
+!! Apart from focused examples, 
+!! demos tie different parts of the plugin together and mix in other libraries.
+
+!! The Showcase has more complete apps inspired by sites done in other mapping APIs.
+!! These help me test how jQuery Geo works in the real world.
+
+==demo==
+!! Now let's make a demo!
+
+!! This will be a trimmed version of the Twitter Heat Map demo
+!! we already have on the website.
+
+==zoom to geolocation==
+Our demo begins by using HTML5's geolocation API to zoom to your current location.
+
+** highlight getCurrentLocation
+
+# switch to html
+
+You need a minimum of a single div to hold the map and we get a view of, hopefully, Denver.
+** remove "hopefully"
+
+# switch to result
+
+==add a location search==
+** embed w/ HTML FIRST? or prepare before talk
+# switch to html
+Apart from relying on geolocation, we will allow a user to search for a location.
+
+The UI needs a tiny form.
+
+# switch to javascript
+
+We send the input to mapquest's Open API which quickly queries Open Street Map data.
+
+** triple click mapquest line
+
+** double click bbox
+** "when we get a result, we update geomap's bbox property which is short for bounding box and describes the map's current view"
+
+# switch to result
+
+So, now that we have this search box, WHERE SHOULD WE GO?
+** prepare something to bait, seriously, but no one tatooine
+** we can go anywhere, even tatooine...which unfortanely is in Flordia.
+
+
+==add a twitter search==
+# scroll to bottom
+
+Twitter's Search API accepts a string query, map center and radius.
+
+We can get the last two from the map using the center option, document width and getPixelSize method.
+
+# switch to html
+
+But we need a second tiny form for the search box.
+
+==add a twitter search (cont)==
+# switch back to javascript
+# scroll to end
+
+When we get results back we check each for a geo property.
+If present, we add it to the map using the append function.
+
+# scroll to top
+
+We've also changed the shapeStyle to something more like a heat map.
+
+# switch to result
+
+What's trending in Denver?
+
+** "anyone know anything going on in Denver today?"
+
+==show tweets in popup==
+# HTML
+Here, we put a popup container inside the map div. The popup won't interfere with map interaction that way.
+
+# JS, scroll to bottom
+We construct true GeoJSON Features instead of just Geometry objects. Features can have extra properties and we add tweet HTML as one of them.
+
+# JS, scroll to top
+Lastly, we hook into the move event. When the user moves the mouse, we call find to check for Features at the location.
+
+If any are found, we add them to the popup and show it.
+
+# result, search for foss4g again, hover
+
+** "so now we can SPY on what what's actually being said about foss4g"
+
+** "seed Twitter about jquerygeo"
+

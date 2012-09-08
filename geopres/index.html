@@ -1,0 +1,748 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>jQuery Geo</title>
+  <link href="../styles/default.css" rel="stylesheet" type="text/css" />
+  <style type="text/css">
+    #frame.present
+    {
+      left: 0;
+      right: 0;
+    }
+    #cmdPresent
+    {
+      -moz-border-radius: 36px;
+      -webkit-border-radius: 36px;
+      border-radius: 36px;
+      font-weight: bold;
+      height: 72px;
+      width: 72px;
+    }
+    .info-list li
+    {
+      list-style-type: none;
+    }
+    .slide
+    {
+      padding-top: .5em;
+    }
+    .present h2
+    {
+      margin-bottom: 1em;
+    }
+    .present h3
+    {
+      font-size: 200%;
+      margin: 1em 0;
+    }
+    .present h4,.present li,.present dt
+    {
+      font-size: 125%;
+      font-weight: bold;
+      margin: 1em 0;
+    }
+    .present a, .present a:visited
+    {
+      color: #a44 !important;
+    }
+    .present dd
+    {
+      display: none;
+    }
+    .present p
+    {
+      display: none;
+    }
+    .present blockquote
+    {
+      font-size: 150%;
+      margin: 1.5em 0;
+    }
+    .present .imgSlide
+    {
+      height: 90%;
+    }
+    .present .who-logos img
+    {
+      margin: 3em;
+    }
+    .footnoteMarker
+    {
+      color: #972F4E !important;
+      font-size: 150%;
+    }
+    .paradigms li
+    {
+      list-style-type: none;
+      margin: 16px;
+    }
+    .present .paradigms li
+    {
+      display: inline-block;
+      margin-left: 32px;
+    }
+    .api-code, .highlight
+    {
+      border-radius: 8px;
+      display: inline-block;
+      padding: 4px;
+    }
+    .default-map
+    {
+      background: blue;
+      color: white;
+    }
+    .center
+    {
+      background: green;
+      color: white;
+    }
+    .event-bind
+    {
+      background: yellow;
+    }
+    .geo-event, .highlight
+    {
+      background: #8ff;
+    }
+    .num-new
+    {
+      background: red;
+      color: white;
+    }
+    .weirdness
+    {
+      background: black;
+      color: white;
+    }
+    .api-func
+    {
+      font-size: 10px !important;
+      float: right;
+      margin: 0;
+    }
+    .api-func li
+    {
+      display: inline-block;
+    }
+    .highlight
+    {
+      
+    }
+    .jsFiddle
+    {
+      width: 100%;
+      min-height: 600px;
+    }    
+    .present .nopres { display: none !important; }
+  </style>
+</head>
+<body>
+  <div id="identity">
+    <a href="../index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          jQuery Geo</h1>
+        <time>2011-07-14</time>
+        <br />
+        <input type="button" id="cmdPresent" class="fancyButton" value="Present!" />
+        <div class="slide">
+          <h2>
+            O hai!</h2>
+          <ul class="info-list">
+            <li>Ryan Westphal</li>
+            <li>Twitter: <a href="http://twitter.com/ryanttb">@ryanttb</a></li>
+            <li>jQuery Geo: <a href="http://jquerygeo.com">jquerygeo.com</a></li>
+          </ul>
+          <ul class="info-list">
+            <li>&mdash; API survey</li>
+            <li>&mdash; Brief jQuery Geo intro</li>
+            <li>&mdash; Build-a-demo</li>
+          </ul>
+          <p>I am a GIS web developer at Applied Geographics in Boston. I build a lot of mapping websites, which is great!, because more people seem to want them nowadays. However, it can get frustrating.</p>
+        </div>
+        <div class="slide">
+          <img class="imgSlide" src="img/mapping-yuno.png" alt="MAPPING - Y U NO EASY?" />
+          <p>
+            There are many ways to get maps onto your website. 
+            To me, though, it feels like it can get too complex too quickly and require more typing than seems necessary.</p>
+        </div>
+        <div class="slide who-logos">
+          <h2>Who?</h2>
+          <img src="img/bing.png" alt="" />
+          <img src="img/esri.png" alt="" />
+          <img src="img/google.png" alt="" />
+          <img src="img/mapquest.png" alt="" />
+          <img src="img/openlayers.png" alt="" />
+          <img src="img/ovi.png" alt="" />
+          <img src="img/leaflet.png" alt="" />
+          <img src="img/polymaps.png" alt="" />
+          <h3 style="display: inline;">...</h3>
+          <p>
+            I'm sure I forgot a few but you can see that there is no shortage of players.</p>
+        </div>
+        <div class="slide">
+          <h2>Reference test</h2>
+          <h3>A task to implement in six APIs</h3>
+          <p>
+            I decided to implement the same task in six of the mapping APIs that I just listed.
+            For each, I attempt to follow the best practices as documented by each API on their website.</p>
+          <ul>
+            <li>add a map to a webpage</li>
+            <li>center and zoom to a location</li>
+            <li>handle click events</li>
+            <li>place the API's default marker/symbol at the clicked location</li>
+          </ul>
+          <p>When I write a new mapping website I need to at least create a map, handle events and show points, which is what this task is doing.</p>
+        </div>
+        <div class="slide">
+          <h2>What about?</h2>
+          <p>
+            These are details that all APIs must handle. How they implement them is different. Depending on how they're implemented, they can be sources of code bloat.</p>
+          <ul>
+		        <li><span class="api-code default-map">default map</span><p>Does the API provide a default map to get you going as fast as possible? How much code do you have to type to show anything?</p></li>
+            <li><span class="api-code center">literal center</span><p>Do you have to wrap simple lon/lat values in objects just to center the map?</p></li>
+            <li><span class="api-code event-bind">inline event binding</span><p>How do you bind to a click event?</p></li>
+            <li><span class="api-code geo-event">geo event</span><p>In your click handler, is the geometry of a clicked point included or do you have to pass pixel values to a function?</p></li>
+            <li><span class="api-code num-new">number of &quot;new&quot; per shape</span><p>How many extra new objects do you have to create to put a shape on the map?</p></li>
+            <li><span class="api-code weirdness">amount of extra weirdness</span><p>Are there any weird hurdles or extra typing required to get going?</p></li>
+          </ul>
+        </div>
+        <div class="slide">
+          <ul class="api-func">
+		        <li><span class="api-code default-map">default map</span></li>
+            <li><span class="api-code center">literal center</span></li>
+            <li><span class="api-code event-bind">inline event binding</span></li>
+            <li><span class="api-code geo-event">geo event</span></li>
+            <li><span class="api-code num-new">number of &quot;new&quot; per shape</span></li>
+            <li><span class="api-code weirdness">amount of extra weirdness</span></li>
+          </ul>
+          <h2>mapquest</h2>
+          <pre>MQA.EventUtil.observe(
+  window, 'load', function() {
+    var map = <span class="api-code default-map">new MQA.TileMap</span>(
+      document.getElementById('map'),
+      7, <span class="api-code center">{ lat: 39.743943, lng: -105.020089 }</span>, 'map'
+    );
+    <span class="api-code event-bind">MQA.EventManager.addListener(
+      map, 'click', function(e) {</span>
+        map.addShape(
+          <span class="api-code num-new">new MQA.Poi</span>(<span class="api-code geo-event">e.ll</span>)
+        );
+      }
+    );
+  }
+);</pre>
+          <p>
+            mapquest's version is very good.</p>
+          <ul class="nopres">
+            <li>there is a default map</li>
+            <li>location is plain object, set during widget init</li>
+            <li>event manager for map events, attach after widget init</li>
+            <li>event argument contains map location</li>
+            <li>only one &quot;new&quot; to add a shape, MQA.Poi</li>
+            <li>no extra weirdness</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <ul class="api-func">
+		        <li><span class="api-code default-map">default map</span></li>
+            <li><span class="api-code center">literal center</span></li>
+            <li><span class="api-code event-bind">inline event binding</span></li>
+            <li><span class="api-code geo-event">geo event</span></li>
+            <li><span class="api-code num-new">number of &quot;new&quot; per shape</span></li>
+            <li><span class="api-code weirdness">amount of extra weirdness</span></li>
+          </ul>
+          <h2>Google</h2>
+          <pre>function init() {
+  var map = <span class="api-code default-map">new google.maps.Map</span>(
+    document.getElementById("map"), {
+      zoom: 8,
+      center: <span class="api-code center">new google.maps.LatLng(-34.397, 150.644)</span>,
+      <span class="api-code default-map">mapTypeId: google.maps.MapTypeId.ROADMAP</span>
+    }
+  );
+  <span class="api-code event-bind">google.maps.event.addListener(
+    map, 'click', function(e) {</span>
+      var shape = <span class="api-code num-new">new google.maps.Marker</span>({
+        position: <span class="api-code geo-event">e.latLng</span>
+      });
+      <span class="api-code weirdness">shape.setMap(map);</span>
+    }
+  );
+}</pre>
+          <p>
+            Google Maps is the most commonly used API by non-GIS developers.</p>
+          <ul class="nopres">
+            <li>there is no longer a default map, can specify google.maps.MapTypeId.ROADMAP during widget init</li>
+            <li>location must be wrapped in an object, LatLng, set during widget init</li>
+            <li>event manager for map events, attach after widget init</li>
+            <li>event argument contains map location</li>
+            <li>only one &quot;new&quot; required to add a shape, google.maps.Marker</li>
+            <li>must add the map to the shape (as opposed to adding the shape to the map) which might be confusing</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <ul class="api-func">
+		        <li><span class="api-code default-map">default map</span></li>
+            <li><span class="api-code center">literal center</span></li>
+            <li><span class="api-code event-bind">inline event binding</span></li>
+            <li><span class="api-code geo-event">geo event</span></li>
+            <li><span class="api-code num-new">number of &quot;new&quot; per shape</span></li>
+            <li><span class="api-code weirdness">amount of extra weirdness</span></li>
+          </ul>
+          <h2>bing</h2>
+          <pre>function init() {
+  var map = <span class="api-code default-map">new VEMap('map')</span>;
+  map.LoadMap(<span class="api-code center">new VELatLong(47.6, -122.33)</span>, 10);
+  <span class="api-code event-bind">map.AttachEvent(
+    "onclick", function(e) {</span>
+      map.AddShape(
+        <span class="api-code num-new">new VEShape(</span>
+          VEShapeType.Pushpin,
+          <span class="api-code geo-event">map.PixelToLatLong(</span>
+            <span class="api-code num-new">new VEPixel</span>(e.mapX, e.mapY)
+          )
+        )
+      );
+    }
+  );
+}</pre>
+          <p>
+            bing isn't too bad either.</p>
+          <ul class="nopres">
+            <li>there is a default map</li>
+            <li>location must be wrapped in an object, VELatLong, set after widget init</li>
+            <li>map widget handles map events, attach after widget init</li>
+            <li>event argument does not contain map location, call PixelToLatLong</li>
+            <li>two &quot;new's&quot; required to add a shape, VEPixel &amp; VEShape</li>
+            <li>no extra weirdness</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <ul class="api-func">
+		        <li><span class="api-code default-map">default map</span></li>
+            <li><span class="api-code center">literal center</span></li>
+            <li><span class="api-code event-bind">inline event binding</span></li>
+            <li><span class="api-code geo-event">geo event</span></li>
+            <li><span class="api-code num-new">number of &quot;new&quot; per shape</span></li>
+            <li><span class="api-code weirdness">amount of extra weirdness</span></li>
+          </ul>
+          <h2>Ovi</h2>
+          <h4>Yahoo! is deprecating their API &amp; points to this.</h4>
+          <pre><span class="api-code weirdness">ovi.mapsapi.util.ApplicationContext.set({
+  appId: "YOUR APPID",
+  authenticationToken: "YOUR TOKEN"
+});</span>
+var map = <span class="api-code default-map">new ovi.mapsapi.map.Display</span>(
+  document.getElementById("map"), {
+    <span class="api-code weirdness">components: [
+      new ovi.mapsapi.map.component.Behavior()
+    ],</span>
+    zoomLevel: 10,
+    center: <span class="api-code center">[52.51, 13.4]</span>,
+    <span class="api-code event-bind">eventListener: {
+      click: [
+        function(e) {</span>
+          map.objects.add(
+            <span class="api-code num-new">new ovi.mapsapi.map.StandardMarker</span>(
+              <span class="api-code geo-event">map.pixelToGeo</span>(e.displayX, e.displayY)
+            )
+          );
+        }
+      ]
+    }
+  }
+);</pre>
+          <p>
+            Yahoo! is killing their map API in September 2011 and links to Ovi.</p>
+          <ul class="nopres">
+            <li>there is a default map</li>
+            <li>location is simple array, set during widget init</li>
+            <li>map widget handles map events, attach during widget init</li>
+            <li>event argument does not contain map location, call pixelToGeo</li>
+            <li>only one &quot;new&quot; required to add a shape, ovi.mapsapi.map.StandardMarker</li>
+            <li>unlike others, Ovi has not dropped developer keys; also, you have add a &quot;behavior&quot; component to make the map interactive, ovi.mapsapi.map.component.Behavior</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <ul class="api-func">
+		        <li><span class="api-code default-map">default map</span></li>
+            <li><span class="api-code center">literal center</span></li>
+            <li><span class="api-code event-bind">inline event binding</span></li>
+            <li><span class="api-code geo-event">geo event</span></li>
+            <li><span class="api-code num-new">number of &quot;new&quot; per shape</span></li>
+            <li><span class="api-code weirdness">amount of extra weirdness</span></li>
+          </ul>
+          <h2>Esri</h2>
+          <pre>dojo.require("esri.map");
+function init() {
+  <span class="api-code weirdness">var spatialRef = new esri.SpatialReference({ wkid: 4326 });</span>
+  var map = <span class="api-code default-map">new esri.Map("map")</span>;
+  <span class="api-code default-map">map.addLayer(
+    new esri.layers.ArcGISTiledMapServiceLayer(
+      "http://server.arcgisonline.com/ArcGIS/rest/services/" + 
+      "World_Street_Map/MapServer"
+    )
+  );</span>
+  map.centerAndZoom(<span class="api-code center">new esri.geometry.Point(-118.15, 33.80, spatialRef)</span>, 10);
+  var markerSymbol = <span class="api-code num-new">new esri.symbol.SimpleMarkerSymbol();</span>
+  <span class="api-code event-bind">dojo.connect(
+    map, "onClick", function (e) {</span>
+      map.graphics.add(
+        <span class="api-code num-new">new esri.Graphic</span>(
+          <span class="api-code num-new">new esri.geometry.Point</span>(
+            <span class="api-code geo-event">e.mapPoint.x, e.mapPoint.y</span>,
+            spatialRef
+          )
+        ),
+        markerSymbol
+      );
+    }
+  );
+}
+dojo.addOnLoad(init);</pre>
+          <p>
+            Esri is a major player in the GIS world.</p>
+          <ul class="nopres">
+            <li>there is no default map, can specify esri.layers.ArcGISTiledMapServiceLayer after widget init</li>
+            <li>location must be wrapped in an object, esri.geometry.Point, set after widget init</li>
+            <li>dojo for map events, attach after widget init</li>
+            <li>event argument contains map location</li>
+            <li>two &quot;new's&quot; required to add a shape, esri.geometry.Point &amp; esri.Graphic</li>
+            <li>location &amp; shape must have an esri.SpatialReference (I may have just lost some readers); also, you need a symbol object lying around to add a shape, e.g., esri.symbol.SimpleMarkerSymbol</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <ul class="api-func">
+		        <li><span class="api-code default-map">default map</span></li>
+            <li><span class="api-code center">literal center</span></li>
+            <li><span class="api-code event-bind">inline event binding</span></li>
+            <li><span class="api-code geo-event">geo event</span></li>
+            <li><span class="api-code num-new">number of &quot;new&quot; per shape</span></li>
+            <li><span class="api-code weirdness">amount of extra weirdness</span></li>
+          </ul>
+          <h2>OpenLayers</h2>
+          <pre>function init() {
+  <span class="api-code weirdness">var vectorLayer = new OpenLayers.Layer.Vector("VectorLayer");</span>
+  var map = <span class="api-code default-map">new OpenLayers.Map</span>(
+    <span class="api-code default-map">'map', {
+      layers: [
+        new OpenLayers.Layer.WMS(
+          "OpenLayers WMS",
+          "http://vmap0.tiles.osgeo.org/wms/vmap0", {
+            layers: 'basic'
+          }
+        ),
+        vectorLayer
+      ]
+    }</span>
+  );
+  map.setCenter(<span class="api-code center">new OpenLayers.LonLat(-71.147, 42.472)</span>, 12);
+  <span class="api-code event-bind">OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {                
+    initialize: function(options) {
+      OpenLayers.Control.prototype.initialize.apply(
+        this, arguments
+      ); 
+      this.handler = new OpenLayers.Handler.Click(this, {
+        click: function(e) {</span>
+          var lonlat = <span class="api-code geo-event">map.getLonLatFromViewPortPx(e.xy);</span>
+          vectorLayer.addFeatures([
+            <span class="api-code num-new">new OpenLayers.Feature.Vector(</span>
+              <span class="api-code num-new">new OpenLayers.Geometry.Point</span>(lonLat.lon, lonLat.lat)
+            )
+          ]);
+        }
+      });
+    } 
+  });
+  <span class="api-code event-bind">map.addControl(new OpenLayers.Control.Click());</span>
+}</pre>
+          <p>
+            OpenLayers is the only GIS-centric open source API that you may have used.</p>
+          <ul class="nopres">
+            <li>there is no default map, can specify OpenLayers.Layer.WMS during widget init</li>
+            <li>location must be wrapped in an object, OpenLayers.LonLat, set after widget init</li>
+            <li>event <i>system</i> used to create a click control, e.g., OpenLayers.Control.Click, to add to the map, attach after widget init</li>
+            <li>event argument does not contain map location, call (interestingly named) getLonLatFromViewPortPx</li>
+            <li>two &quot;new's&quot; required to add a shape, OpenLayers.Geometry.Point &amp; OpenLayers.Feature.Vector</li>
+            <li>you need an extra layer just for shapes; also, the event system for click handling</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <h2>Paradigm</h2>
+          <ul class="paradigms">
+            <li><img src="img/jquery-logo.png" alt="" />
+            <li><img src="img/jquerygeo-logo.png" alt="" />
+          </ul>
+          <h3>Write less, map more!</h3>
+          <p>The jQuery paradigm is: write less, do more. We implement this with mapping, so, jQuery Geo's paradigm is: write less, map more.</p>
+        </div>
+        <div class="slide">
+          <ul class="api-func">
+		        <li><span class="api-code default-map">default map</span></li>
+            <li><span class="api-code center">literal center</span></li>
+            <li><span class="api-code event-bind">inline event binding</span></li>
+            <li><span class="api-code geo-event">geo event</span></li>
+            <li><span class="api-code num-new">number of &quot;new&quot; per shape</span></li>
+            <li><span class="api-code weirdness">amount of extra weirdness</span></li>
+          </ul>
+          <h2>jQuery Geo</h2>
+          <pre>$(function() {
+  var map = $("#map").geomap({
+    center: <span class="api-code center">[ -71.147, 42.472 ]</span>,
+    zoom: 10,
+    click: <span class="api-code event-bind">function(e, geo) {</span>
+      map.geomap("append", <span class="api-code geo-event">geo</span>);
+    }
+  });
+});</pre>
+          <ul class="nopres">
+            <li>100% custom JavaScript, not wrapping any 3rd-party controls</li>
+            <li>OpenStreetMap by default</li>
+            <li>location is a GeoJSON position, set during widget init</li>
+            <li>jQuery for map events, attach during widget init</li>
+            <li>event argument contains map location, a GeoJSON point</li>
+            <li>zero &quot;new's&quot; required to add a shape</li>
+            <li>no extra weirdness</li>
+          </ul>
+        </div>
+        <div class="slide">
+          <img class="imgSlide" src="img/dos-equis.jpg" alt="I don't always add maps, but when I do it's in four lines of code or less" />
+        </div>
+        <div class="slide">
+          <h2>Shape interaction</h2>
+          <pre>$(function() {
+  var map = $(&quot;#map&quot;).geomap({
+    center: [ -71.147, 42.472 ],
+    zoom: 10,
+    click: function(e, geo) {
+
+      var existing = map.geomap(<span class="highlight">&quot;find&quot;</span>, geo, 3);
+
+      if (existing.length &gt; 0) {
+        map.geomap(<span class="highlight">&quot;remove&quot;</span>, existing[0]);
+      } else {
+        map.geomap(<span class="highlight">&quot;append&quot;</span>, geo);
+      }
+
+    }
+  });
+});</pre>
+          <p>
+            We've just seen how to add points but we also need to interact with them.</p>
+          <p>
+            In jQuery Geo, you do this with the map widget &amp; other plugin functions.</p>
+          <p>
+            Shapes don't trigger their own events. You use the find method to perform a spatial query.</p>
+          <p>
+            The code above adds or removes a shape depending on weither or not one already exists at the click location.</p>
+        </div>
+        <div class="slide">
+          <h2>GIS FTW</h2>
+          <pre>$("#map").geomap({
+    services: [ {
+      id: "NewJersey",
+      type: "tiled",
+      getUrl: function (view) {
+        return "http://njgin.state.nj.us/ArcGIS/rest/services/basemap_v4/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column;
+      }
+    } ],
+    tilingScheme: {
+      tileWidth: 512,
+      tileHeight: 512,
+      pixelSizes: [
+        3472.22222222222,
+        2604.16666666667,
+        2170.13888888889,
+        1562.5,
+        976.5625,
+        494.791666666667,
+        260.416666666667,
+        130.208333333333,
+        65.1041666666667,
+        32.5520833333333,
+        21.7013888888889,
+        10.8506944444444,
+        5.20833333333333,
+        2.08333333333333,
+        1.04166666666667
+      ],
+      origin: [-842000, 1440000]
+    },
+    center: [458240.213369, 458773.907696],
+    zoom: 2
+  });</pre>
+          <p>
+            So far jQuery Geo looks a lot like the other non-GIS APIs. However, there is full support for any mapping server and custom tiling schemes.</p>
+          <p>
+            Once you step outside the world of web mercator, you may need an object like this in the worst case but the rest of jQuery Geo works the same.</p>
+        </div>
+        <div class="slide">
+          <img class="imgSlide" src="img/apis-rage.png" alt="F U API documentation" />
+          <p>
+            Even while making the simple examples I showed above, I got lost in some API docs.</p>
+          <p>
+            For example, handling click events in OpenLayers. The website says the demos are &quot;the primary source of documentation.&quot; After looking through six demos, the best practices appear to be building a click handler control.</p>
+          <p>
+            With jQuery Geo, the documentation comes first.</p>
+        </div>
+        <div class="slide">
+          <h2>Lots-o-docs!</h2>
+          <img src="img/geomap-options.png" alt="" />
+          <img src="img/geomap-events.png" alt="" />
+          <img src="img/geomap-methods.png" alt="" />
+          <p>
+            Every function &amp; property in jQuery Geo is well documented and has a focused example page before I make the feature public.</p>
+          <p>
+            Anything not in the docs is either not supported yet or not supported by design.</p>
+          <p>
+            You should only dive into the project source code because you want to, never because you have to.</p>
+        </div>
+        <div class="slide">
+          <h2>Examples, demos and the showcase</h2>
+          <img src="img/geo-examples.png" alt="" />
+          <p>
+            Apart from the focused examples, demos tie different parts of the plugin together and mix in other libraries.</p>
+          <p>
+            The Showcase has more complete apps inspired by sites done in other mapping APIs. These help me test how jQuery Geo works in the real world.</p>
+        </div>
+        <div class="slide">
+          <h2>Demo</h2>
+          <h3>
+            Let's make a demo!</h3>
+          <p>
+            This will be a trimmed version of the Twitter heatmap demo already on jquerygeo.com.</p>
+          <img alt="screenshot of jQuery Geo Twitter Heatmap demo" src="img/earthquake-heat.png" />
+        </div>
+        <div class="slide">
+          <h2>zoom to geolocation</h2>
+          <p><a href="http://jsfiddle.net/ryanttb/Pre4k/">zoom to geolocation fiddle</a></p>
+          <p>You've already seen a simple example of zooming to a specific location so this demo starts out from the more interesting point: zooming to your current location. Here we use HTML5's geolocation API to ask a user where they are and initialize the map's center appropriately.</p>
+          <iframe class="jsFiddle" src="http://jsfiddle.net/ryanttb/Pre4k/embedded/js,html,result/presentation/"></iframe>
+        </div>
+        <div class="slide">
+          <h2>add a location search</h2>
+          <p><a href="http://jsfiddle.net/ryanttb/3LpqG/">add a location search fiddle</a></p>
+          <p>In case geolocation isn't allowed, is off, or fails, we can give the user location search power by using mapquest's open API to query Open Street Map data. Their response time is slightly faster than actually using OSM's server. The result is not true GeoJSON but we can quickly reorder the bbox array before setting geomap's extent.</p>
+          <iframe class="jsFiddle" src="http://jsfiddle.net/ryanttb/3LpqG/embedded/js,html,result/presentation/"></iframe>
+        </div>
+        <div class="slide">
+          <h2>add a twitter search</h2>
+          <p><a href="http://jsfiddle.net/ryanttb/2PCUu/">add a twitter search fiddle</a></p>
+          <p>We can make a call to Twitter's Search API sending it a string to query, the map's center, and a radius in kilometers. Since the default projection (Web Mercator) is in meters, we can calculate the radius by multiplying the pixel size (the number of meters/pixel) by half the page's width (in pixels). The result is meters which we divide by 1000 for kilometers. Twiter's Search API returns an error if the radius is greater than 2500 km so we have to limit it.</p>
+          <p>For each result, we check for a geo property and append the shape to the map. The geo result from Twitter is almost a GeoJSON point but the longitude and latitude are reversed.</p>
+          <p>While initializing the map, we set the style to a larger translucent circle without a border to make it look more like a heat map.</p>
+          <iframe class="jsFiddle" src="http://jsfiddle.net/ryanttb/2PCUu/embedded/js,html,result/presentation/"></iframe>
+        </div>
+        <!--<div class="slide">
+          <h2>update on bboxchange</h2>
+          <p><a href="http://jsfiddle.net/ryanttb/8LQLW/">update on bboxchange fiddle</a></p>
+          <p>The only addition here is that we've hooked into the bboxchange event and call search every time the user pans or zooms the map.</p>
+          <iframe class="jsFiddle" src="http://jsfiddle.net/ryanttb/8LQLW/embedded/js,html,result/presentation/"></iframe>
+        </div>-->
+        <div class="slide">
+          <h2>show tweets in popup</h2>
+          <p><a href="http://jsfiddle.net/ryanttb/y2gTh/">show tweets in popup fiddle</a></p>
+          <p>This time, we've added some HTML for a hover popup. The HTML is inside the map div so it doesn't interfere with user interaction.</p>
+          <p>Toward the bottom, we add a true GeoJSON Feature to the map instead of just the shape. You can attach extra arbitrary properties to Features. In this case, we add the user and tweet text as HTML.</p>
+          <p>Lastly, we hook into the move event to track when a user moves the mouse over the map. We can search for shapes under the map cursor using the find method. If any are found, we add them to the popup and show it.</p>
+          <iframe class="jsFiddle" src="http://jsfiddle.net/ryanttb/y2gTh/embedded/js,html,result/presentation/"></iframe>
+        </div>
+        <div class="slide">
+          <h2>
+            Round trip</h2>
+          <h3>
+            Questions?</h3>
+          <ul class="info-list">
+            <li>Ryan Westphal</li>
+            <li>Twitter: <a href="http://twitter.com/ryanttb">@ryanttb</a></li>
+          </ul>
+          <h3>
+            Thank you!</h3>
+          <ul class="info-list">
+            <li>jQuery Geo: <a href="http://jquerygeo.com">jquerygeo.com</a></li>
+            <li>presentation: <a href="http://trippingthebits.com/geopres/">http://trippingthebits.com/geopres/</a></li>
+            <li>github project: <a href="http://github.com/AppGeo/geo">http://github.com/AppGeo/geo</a></li>
+            <li>Applied Geographics: <a href="http://appgeo.com">http://appgeo.com</a></li>
+          </ul>
+        </div>
+        <div id="comments" class="slide">
+          <h2>
+            Comments</h2>
+          <div id="disqus_thread"></div>
+          <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+          <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+        </div>
+      </div>
+      <div id="tags">
+        <ul>
+          <li>
+            <a href="http://twitter.com/#search?q=jQueryGeo">jQuery Geo</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.6.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(function () {
+      $("#cmdPresent").click(function () {
+        if ($("#frame").hasClass("present")) {
+          $("#frame").removeClass("present");
+          $(".slide").css("height", "auto");
+          $(".slide").unbind("click");
+          $(this).val("Present!");
+        } else {
+          $("#frame").addClass("present");
+          $(".slide").height($(window).height()).click(slideClick)[0].scrollIntoView();
+          $(this).val("Read!");
+        }
+      });
+
+      function slideClick(e) {
+        if (e.target.nodeName.toUpperCase() != "A") {
+          var nextSlide = $(this).next();
+          if (nextSlide.size() > 0) {
+            nextSlide[0].scrollIntoView();
+          }
+        }
+      }
+    });
+  </script>
+
+  <script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'trippingthebits'; // required: replace example with your forum shortname
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    var disqus_identifier = 'ttb_geopres';
+    var disqus_url = 'http://trippingthebits.com/geopres/';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26113662-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s)
+    } (document, 'script'));
+  </script>
+</body>
+</html>

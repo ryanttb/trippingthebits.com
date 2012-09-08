@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>FOSS4G NA 2012</title>
+
+  <meta name="description" content="FOSS4G NA 2012">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="../styles/default.css" rel="stylesheet">
+</head>
+<body>
+  <div id="identity">
+    <a href="../index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>FOSS4G NA 2012</h1>
+        <time>2012-04-17</time>
+
+        <p>Here's a collection of raw notes I took at sessions during FOSS4G NA 2012.</p>
+
+        <h2>PostgreSQL</h2>
+
+        <ul>
+<li> PostgreSQL 9.2 in about September</li>
+<li> many geeky performance updates</li>
+<li> index-only scans will affect spatial data the most</li>
+<li> new visiblilty map: in-memory bitmap of data currently loaded</li>
+<li> takes 1% as long as getting this info from the physical table (heap)</li>
+<li> read/write scalability; better support for cloud hosting</li>
+<li> cascading replication &amp; other replication improvements</li>
+<li> multi-master replication, hopefully in 9.3</li>
+<li> &quot;I don't know how it's going to happen, but it has to.&quot;</li>
+<li> we love &quot;weird data&quot;, e.g., spatial data</li>
+<li> new weird data in 9.2 is JSON!!!!</li>
+<li> JSON &lt;==&gt; Hstore for indexed JSON!</li>
+<li> write views in JavaScript!</li>
+<li> spatial index directly in PostgreSQL, should (will?) be used in PostGIS 2.1</li>
+        </ul>
+
+        <h2>CartoDB</h2>
+
+        <ul>
+<li> presented by: <a href="https://twitter.com/#!/jatorre">@jatorre</a></li>
+<li> some new, awesome apps using CartoDB</li>
+<li> CartoDB demo</li>
+<li> download wifi hotspot data from NYC OpenData</li>
+<li> support different data types (spoke too fast), zipped shape files</li>
+<li> drag &amp; drop from desktop</li>
+<li> I wonder if they fixed the issue where uploading a .geojson export from QGIS failed</li>
+<li> can edit geometry when designing map</li>
+<li> individual vertex editing for polygons</li>
+<li> style with CartoCSS</li>
+<li> uses new PostGIS 2.0 already</li>
+<li> can query for styled tiles with &quot;Maps API&quot;; style query string argument</li>
+<li> can query for actual data with &quot;SQL API&quot;</li>
+<li> can use new PostgreSQL index nearest query</li>
+<li> &quot;I have seen the future and it is not made of tiles&quot;</li>
+<li> I would say: not only made of tiles</li>
+<li> 8 Bic map demo looks great!</li>
+<li> open source; they make money from tiered hosting plans</li>
+<li> free tier</li>
+<li> can import OSM data</li>
+        </ul>
+
+        <h2>MapBox</h2>
+
+        <ul>
+<li> presented by: <a href="https://twitter.com/#!/tmcw">@tmcw</a></li>
+<li> presentation is here: <a href="http://ds.io/beyond-maps">ds.io/beyond-maps</a></li>
+<li> Google &quot;begat&quot; Maps API because people were creating their own mashups by hand</li>
+<li> open source options adopt big software company's interface to help with conversion</li>
+<li> google helped change mapping</li>
+<li> tiles don't need to reload</li>
+<li> cartography: not all roads need to be shown</li>
+<li> start thinking in frames per second</li>
+<li> eliminate old ideas users don't care about: scale bar</li>
+<li> users can make/design maps with greater detail than any company (including MapBox)</li>
+        </ul>
+
+        <h2>UX Panel</h2>
+
+        <ul>
+<li> why does the interface suck?</li>
+<li> the more stuff your product does, the more complicated the ui has to be</li>
+<li> we have to get designers involved because we're software engineers</li>
+<li> is $1M the price of a good UI?</li>
+<li> current OSM UI already cost well over $1M in time</li>
+        </ul>
+
+        <h2>OpenLayers</h2>
+
+        <ul>
+<li> github gives credit to more contributors</li>
+<li> good mobile support</li>
+<li> tile animation</li>
+<li> new Zoom control (only +/- buttons)</li>
+<li> nice accessability features</li>
+<li> writes tiles to localStorage automatically?</li>
+<li> do they know there's not much space for that? Can we shut it off?</li>
+<li> the important part about HTML5 is that you think it's cool</li>
+<li> UTFGrid integration</li>
+<li> continuous zooming</li>
+<li> does it switch to higher tile zoom (and scale backwards) at a middle threshold?</li>
+<li> improved APIs</li>
+<li> can pass plain objects to some functions</li>
+<li> can abort tiles</li>
+<li> OpenLayers is the cat chasing a mouse</li>
+<li> &quot;There's some question about the size of the cat.&quot;</li>
+<li> hosted build tool would be an improvement</li>
+        </ul>
+
+        <h2>OpenLayers in 3D</h2>
+
+        <ul>
+<li> presented by: <a href="https://twitter.com/#!/pelicanmapping">@pelicanmapping</a></li>
+<li> original plugin didn't work in Chrome</li>
+<li> nice 3D mountain demo</li>
+<li> OpenLayers 2D to 3D with a click of a checkbox</li>
+<li> GeoTIFF to encode elevation data = &quot;home grown, JSON-encoded tile&quot; = nice idea!</li>
+        </ul>
+
+        <h2>PostGIS</h2>
+
+        <ul>
+<li> NOT backwards compatible</li>
+<li> because serialize to disk is different</li>
+<li> PostGIS 1 had unaligned data storage</li>
+<li> new 3D functions: ST_3dDistance, etc.</li>
+<li> new 3D types: triangle, tin</li>
+<li> 3D index-based query: &amp;&amp;&amp;</li>
+<li> new PostGIS connection GUI</li>
+<li> batch shapefile loading in the GUI</li>
+<li> dump spatial tables to shapefiles</li>
+<li> geometry data type can include geometry type, e.g., MultiPolygon, and SRID</li>
+<li> can still use un-typed geometry table</li>
+<li> better raster support</li>
+<li> load raster with raster2pgsql command</li>
+<li> join between raster and geometry tables?</li>
+<li> rasters are large collections of tiny chips</li>
+<li> rasters are for analysis, not visualization</li>
+<li> can snap rows: ST_Snap &quot;work in progress, but mostly works&quot;</li>
+<li> force features to valid: ST_MakeValid</li>
+<li> nearest neighbor indexed searches</li>
+<li> order by geom <-> ... limit 10</li>
+        </ul>
+
+        <h2>jQuery Geo</h2>
+
+        <b>&lt;shameless plug /&gt;</b>
+
+        <ul>
+          <li>presented by: <a href="https://twitter.com/#!/ryanttb">@ryanttb</a></li>
+          <li>AppGeo has had an internal map widget for over eight years</li>
+          <li>feature set akin to OpenLayers, size close to Modest Maps</li>
+          <li>&quot;jQuery Geo is designed to change the way that you write JavaScript...for mapping&quot;</li>
+          <li>like jQuery, one script tag hosted on worldwide CDN</li>
+          <li>can use map services not in web mercator</li>
+        </ul>
+
+        <h2>Challenges Panel</h2>
+
+        <h3>NYC</h3>
+
+        <ul>
+<li> 200,000 employees in all agencies</li>
+<li> moderate degree of specialization</li>
+<li> low degree of colabaration between agencies</li>
+<li> 17 developers/analysis in department</li>
+<li> everything built internally, maintained internally</li>
+<li> some apps have lived many, many years past their lifespan</li>
+<li> in house mapping framework developed 4/5 years ago (open layers wasn't ready yet)</li>
+<li> geoserver in that framework, as is geowebcache</li>
+<li> app shows all streets that are closed, based on OpenGeo stack w/o PostGIS (because Oracle shop)</li>
+<li> all components available for other city agencies on shared service environment</li>
+<li> oracle not going away any time soon</li>
+<li> many other commercial software to integrate</li>
+<li> painful integration with SharePoint</li>
+<li> &quot;legacy solutions being built every day&quot;</li>
+<li> simple operations support doesn't need knowledge transfer, e.g., start/stop services</li>
+<li> moving off of Solaris to RedHat Linux</li>
+<li> first group in DoITT to move toward open source</li>
+<li> it takes leadership to create adoption of open source</li>
+<li> having a support model around an open source solution is &quot;key&quot;</li>
+<li> legal issues do not exist, do it and apologize later</li>
+<li> don't ask attornies unless you have to, they will find things</li>
+<li> not &quot;most interested&quot; in any one part of OpenGeo stack</li>
+<li> it's all about what the project needs and what best fits it</li>
+<li> simulated the traffic hit while trying to generate new tiles, etl, etc. for snow removal app</li>
+<li> concern is scalability</li>
+<li> especially on &quot;our antequated servers&quot;</li>
+<li> OpenGeo team came to help</li>
+<li> would like to know what community wants from agencies like DoITT</li>
+<li> biggest app to use OpenGeo is City Map </li>
+<li> most popular is snow plow app</li>
+<li> see us continuing down the open source road</li>
+<li> excited by projects out there</li>
+<li> hopefully the agency follows along</li>
+<li> getting open source software had to go through the same accreditation/security audits of all software</li>
+        </ul>
+
+        <h3>FCC</h3>
+
+        <ul>
+<li> brought on for national broadband map</li>
+<li> many silos in fcc</li>
+<li> focus on what we can do in the future</li>
+<li> broadband map introduced new technologies to fcc</li>
+<li> agency has a lot of QGIS usage</li>
+<li> people have come to it w/o thinking a GIS problem, but to look at data, e.g., census</li>
+<li> use MapBox &amp; TileMill for authoring Maps (publish all maps on fcc.gov)</li>
+<li> legacy of expertise, esp. in database</li>
+<li> PostgreSQL wasn't mature enough at the time for some projects</li>
+<li> idea of moving to more loosly-coupled systems</li>
+<li> should be able to work from an API call instead of proprietary third party solution</li>
+<li> open source developers used to doing a lot of system admin, usually have root access</li>
+<li> now, ops admins don't let devs get too close to hardware</li>
+<li> but devs are trying to push that boundary</li>
+<li> internally, you need to cultivate change (to open source)</li>
+<li> most users don't care if they're using open source, some seek it out</li>
+<li> if there's a license that other agencies have used, then there's not much to worry about</li>
+<li> PostGIS on a super computer can do a lot of analysis</li>
+<li> didn't offer horizontal scaling that IT staff thought it could</li>
+<li> &quot;OpenGeo team scrambled to support us&quot;</li>
+<li> likes that people want to build apps around government data</li>
+<li> having open APIs is a way we give back</li>
+<li> giving code back to the community is good (open sourced Drupal code for MapBox)</li>
+<li> part of RFQs now mention that source must be put on public site like github</li>
+<li> some good ideas snuck through with broadband map</li>
+<li> fully RESTful</li>
+<li> use OGC</li>
+<li> app must use own API</li>
+<li> would like to stop hosting own hardware</li>
+<li> see us moving geoserver to cloud space</li>
+<li> looking for OpenGeo to guide us</li>
+        </ul>
+
+        <h2>Round trip</h2>
+
+        <p>I had a great time at FOSS4G NA and look forward to a great year of open source!</p>
+
+      </div>
+      <div id="tags">
+        <ul>
+          <li>
+            <a href="http://twitter.com/#search?q="></a>
+          </li>
+        </ul>
+      </div>
+      <div id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.6.4.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    var disqus_shortname = 'trippingthebits';
+    var disqus_identifier = 'ttb_foss4g2012';
+    var disqus_url = 'http://trippingthebits.com/foss4g2012/';
+
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26113662-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s)
+    } (document, 'script'));
+  </script>
+</body>
+</html>

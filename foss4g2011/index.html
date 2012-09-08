@@ -1,0 +1,516 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>FOSS4G 2011</title>
+  <link href="../styles/default.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="identity">
+    <a href="../index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          FOSS4G 2011</h1>
+        <div><b>Updated:</b> <time>2011-09-16</time></div>
+        <p>Here are some raw notes from my FOSS4G workshops &amp; sessions so far. Enjoy!</p>
+        <h2>Mapnik &amp; TileMill workshop</h2>
+        <ul>
+<li>Presented by Development Seed</li>
+<li>You should learn Python &amp; node.js</li>
+<li>TileMill used in today's example</li>
+<li>TileStream used to serve tiles</li>
+<li>TileStream hosted is $50/mo for only five 1GB .mbtiles files</li>
+<li>On IRC, visit #mapnik</li>
+<li>TileMill Windows client planned in 2 months</li>
+<li>
+Python sample
+<ul>
+<li>- import mapnik2</li>
+<li>- m = mapnik2.Map(256, 256)</li>
+<li>-- Python error</li>
+<li>- type a module name to list from where it was imported</li>
+<li>we attempted to install mapnik2 from source but it didn't work, on to TileMill</li>
+</ul>
+</li>
+<li>
+TileMill is a website, control room
+<ul>
+<li>- add data/layer</li>
+<li>- can view data attributes</li>
+<li>- geojson/spatiallite via OGR</li>
+<li>- how does OGR do lat/lng vs x/y?</li>
+<li>- drag drop layer order</li>
+<li>- save to update map w/ new CSS</li>
+<li>- carto is LESS CSS-like language, .mss files, link for reference</li>
+<li>- has variables</li>
+</ul>
+</li>
+<li>
+new project
+<ul>
+<li>- change Map background-color, save</li>
+<li>- new layer</li>
+<li>- postgis, connection string</li>
+<li>- postgres command line</li>
+<li>-- psql -l (list databases)</li>
+<li>-- psql database-name</li>
+<li>-- \d to list tables</li>
+<li>- error mapbox is undefined</li>
+<li>-- auth error, check username and password</li>
+<li>- if no rule, nothing renders for layer</li>
+<li>- #data { marker-width: 2; }</li>
+<li>- [highway='traffic_signals'][zoom&gt;=10]</li>
+<li>- assumes spherical Mercator</li>
+<li>- wrench=&gt;view mapnik XML link</li>
+<li>- subquery as data source: (select name from roads where ST_Length(way) &gt; 8000) as longroads</li>
+<li>- that ending <i>as</i> is required</li>
+<li>- line::case is border, line::fill is fill? these rules were confusing</li>
+<li>- carto has a command line, export as mml</li>
+</ul>
+</li>
+<li>
+MBTile
+<ul>
+<li>- embeds every feature id in tile as JSON in tile itself</li>
+<li>- replace .png with .grid.json to see all feature data</li>
+<li>- follow TMS <i>standard</i></li>
+</ul>
+</li>
+<li>Modest maps, web mer JavaScript api</li>
+<li>
+Export
+<ul>
+<li>- preview is only for MB tiles</li>
+<li>- download MB tile</li>
+<li>- cp to ~/proj/tilemill/files/export/</li>
+<li>- browse TileMill (:8888)/#!/ for list</li>
+<li>- you do have access to the .grid.json file</li>
+</ul>
+</li>
+<li>TileStash renders mapnik to amazon</li>
+<li>Fast maps</li>
+<li>- ab tool to profile requests / sec</li>
+<li>- Proj 4.8 doesn't lock as much</li>
+<li>- OGR has trailing spaces in proj4 string, can cause mapnik to reproject on fly to same projection, be careful</li>
+        </ul>
+        <h2>node.js &amp; Polymaps workshop</h2>
+<ul>
+<li>Github proj, chelm/FOSS4G-Node.js...<ul>
+  <li>- network issues preventing start by 1 hour</li>
+  </ul>
+  </li>
+<li>npm - node package manager<ul>
+  <li>- search packages on website</li>
+  <li>- geonode - GEOS wrapper on node.js</li>
+  <li>- express &amp; socket io to be talked about today</li>
+  </ul>
+  </li>
+<li>node<ul>
+  <li>- evented framework = callbacks</li>
+  <li>- callbacks don't block the thread</li>
+  <li>- commonjs modules</li>
+  <li>-- hello.js: exports.myvar = function () ...</li>
+  <li>-- require ('./hello')</li>
+  <li>- only one thread, don't block it yourself</li>
+  </ul>
+  </li>
+<li>express<ul>
+  <li>- req.query is an object</li>
+  <li>- template engine called jade</li>
+  <li>-- response.render( &#39;template.jade&#39;, args)</li>
+  <li>-- look in views dir by default</li>
+  </ul>
+  </li>
+<li>EventEmitter<ul>
+  <li>- emit(eventname, args)</li>
+  </ul>
+  </li>
+<li>Ticker.prototype = new EventEmitter adds emit &amp; addListener to Ticker function object<ul>
+  <li>- prototypical inheritance</li>
+  </ul>
+  </li>
+<li>Twitter<ul>
+  <li>- npm install twitter-node</li>
+  </ul>
+  </li>
+<li>Polymaps<ul>
+  <li>- all svg</li>
+  <li>- styled with CSS</li>
+  <li>- can embed canvas in svg element for dynamic color changes</li>
+  <li>- tiles &amp; geojson</li>
+  <li>- vector tiles?!</li>
+  <li>- but only TtileStash creates vector tiles so far</li>
+  <li>- clusters on load, not on the fly</li>
+  <li>- 38k minified</li>
+  <li>- lots of .add(po.functionality()) chained</li>
+  <li>- .on("load", function ( data ) { data.features[0].element } )</li>
+  <li>- CloudMade has hosted tiles once you register</li>
+  <li>- colorbrewer - gis color ramps in JavaScript</li>
+  <li>- protovis - data analysis, Scale.quantile, etc.</li>
+  <li>- geocommons, datasets available via .json extension</li>
+  <li>- using jQuery for events</li>
+  <li>- map.coordinateLocation function</li>
+  <li>- socket io using web sockets to bind client handlers to server events </li>
+  </ul>
+  </li>
+</ul>
+<h2>State of PostGIS</h2>
+<ul>
+<li> paul ramsey</li>
+<li> database is types, indexes &amp; functions</li>
+<li> spatial database just adds spatial to to those three</li>
+<li> mysql is STILL not a spatial database</li>
+<li> arcsde was never a spatial database, it's middleware. also, it's going away</li>
+<li> history of postgis versions</li>
+<li> native support by esri in arcgis server</li>
+<li> &quot;not as cool as new kids&quot; CouchDB, etc.</li>
+<li> we're &quot;yesql&quot;!</li>
+<li> postgis has prepared geometry<ul>
+  <li>point in polygon is O(n), but indexing edges brings it to O(log(n))</li>
+  </ul>
+  </li>
+<li> supports curves</li>
+<li> 2.0 out in six month-ish</li>
+</ul>
+<h2>Oceans using OGC services</h2>
+<ul>
+<li> scientists &amp; tech guys working together</li>
+<li> data comes from scientists in all formats</li>
+<li> filter by time &amp; depth, the ocean is &quot;4D&quot;</li>
+<li> Flex thin client, many filters</li>
+<li> ncwms? wms that serves up nc? data</li>
+<li> scientists willing to take a cut in performance in order to see the data</li>
+<li> LarvaMap, find where larva are floating, they can't swim after they hatch</li>
+<li> NetCDF, open source server over HTTP for large data sets</li>
+<li> OGC-Search, find WMS services<ul>
+  <li>Metadata isn't updated, a problem for search</li>
+  <li>version 2, bbox search</li>
+  </ul>
+  </li>
+<li> Environmental Data Connector pulls open source data into ArcGIS</li>
+<li> github/asascience</li>
+</ul>
+<h2>Geomagas</h2>
+<ul>
+<li>Native<ul>
+  <li>- pro: all device sensors</li>
+  <li>- con: app stores </li>
+  </ul>
+  </li>
+<li>mobile web<ul>
+  <li>- caniuse html5, html5 isn&#39;t everywhere yet</li>
+  <li>- JavaScript is slow</li>
+  </ul>
+  </li>
+<li>Current geomajas<ul>
+  <li>- Java is both dev &amp; test environment</li>
+  </ul>
+  </li>
+<li>Gwt<ul>
+  <li>- works w/ mobile </li>
+  <li>- only sends code you use</li>
+  <li>- one html file is everything</li>
+  </ul>
+  </li>
+<li>Future<ul>
+  <li>- all Java, split common api out for android &amp; blackberry</li>
+  <li>- combine layer tiles on server</li>
+  </ul>
+  </li>
+<li>Demo<ul>
+  <li>- android native browser missing svg, using Firefox for mobile demo</li>
+  </ul>
+  </li>
+</ul>
+<h2>Opticks</h2>
+<ul>
+<li> comet created for USAF</li>
+<li> open sourced in 2007, bringing internal code over in parts</li>
+<li> why open source?<ul>
+  <li>hard to get other gov agencies to use it otherwise: &quot;not invented here&quot; syndrome</li>
+  <li>Ball Aerospace is a service company, will never sell software</li>
+  </ul>
+  </li>
+<li> problems?<ul>
+  <li>contracted CollabNet to resolve open source confusion: doesn't mean just anyone can make code changes</li>
+  </ul>
+  </li>
+<li> &quot;geospatial infrastructure&quot; first part open sourced</li>
+<li> lgpl, sourceforge</li>
+<li> multiple gov projects using opticks as foundation</li>
+<li> applied for OSGeo incubation</li>
+<li> no governace board but governace board required for OSGeo incubation</li>
+<li> all core contributors are or were Ball employees</li>
+<li> still slow from outside contributions; mostly bug reports and docs</li>
+</ul>
+<h2>Social Networks on OpenLayers</h2>
+<ul>
+<li> started with valencia tourism geoportal</li>
+<li> OpenLayers 2.11 has a special jsonp protocol handler, fly..something?</li>
+<li> twitter &amp; gowalla from POIProxy framework, pretty nice OpenLayers plugin<ul>
+  <li>access to different POI services</li>
+  </ul>
+  </li>
+</ul>
+<h2>Google Fusion Tables for flood mapping</h2>
+<ul>
+<li>Had to be done in 90 days</li>
+<li>Fema nfhl can map flood planes but little control<ul>
+  <li>&nbsp;also not friendly</li>
+  </ul>
+  </li>
+<li>Mashup w/ Google, points &amp; poly</li>
+<li>No code change but suddenly 45 deg oblique imagery one morning</li>
+<li>Popup has links &amp; data from fusion table</li>
+<li>Built Google table by hand</li>
+<li>Schema create statement generated via postgres select</li>
+<li>Postgres select to generate Google select</li>
+<li>Secret: load data with insert but send 500 inserts per request w/ semicolons between</li>
+<li>FT drops points over 500 per line<ul>
+  <li>- they chopped the geometry by tiling scheme</li>
+  <li>- no geometry had more than 500 points</li>
+  <li>- better now on Google's side</li>
+  </ul>
+  </li>
+<li>Cartography done via table, fill</li>
+<li>Very accurate</li>
+<li>Not enough carto options, they want cross hatching<ul>
+  <li>- request sent, waiting for google</li>
+  </ul>
+  </li>
+<li>Summary: worked very well</li>
+<li>Automated create / insert PHP scripts available vcfloodinfo.net</li>
+<li>Using free Google maps</li>
+<li>FT, only five layers allowed</li>
+<li>Can filter data on the map</li>
+<li>Very active group</li>
+<li>Can't use internal only due to Google license</li>
+<li>Shows ads</li>
+</ul>
+<h2>GXP</h2>
+<ul>
+<li>For quickly editing sites</li>
+<li>GeoExplorer uses this library</li>
+<li>{ptype: gxp_legend, outputTarget: id}</li>
+<li>gxp_featuremanager, layer: { local, name: 'USA:streets' }</li>
+<li>From OpenGeo</li>
+<li>Like esri build an app, full website</li>
+<li>Feature editing with snapping to other layers<ul>
+  <li>- gxp_featureeditor, snappingAgent:</li>
+  <li>- snapping agent references another layer</li>
+  </ul>
+  </li>
+<li>github/opengeo/gxp</li>
+<li>Can use Google: map, street view, search</li>
+<li>Using openlayers behind the scenes?</li>
+<li>bartvde@opengeo</li>
+<li>No undo yet</li>
+<li>GeoServer-based authentication</li>
+<li>Can make plugins</li>
+<li>Other note: GeoGit new project adds versioning to geoserver from OpenGeo?</li>
+</ul>
+<h2>Using PostGIS with QGIS</h2>
+<ul>
+<li> first use case for QGIS was only a postgis viewer</li>
+<li> now it's a gis platform</li>
+<li> version 2 coming, raster support &amp; routing</li>
+<li> filter source table while loading as layer</li>
+<li> updatable view: a PostGIS view that can be edited in QGIS</li>
+<li> uses postgresql for authentication</li>
+<li> wfs-t support<ul>
+  <li>http level rights (web auth)</li>
+  </ul>
+  </li>
+<li> offline editing</li>
+<li> python plugins: pgVersion, subversion for postgresql</li>
+<li> fast SQL layer, dynamic queries (like ArcMap's Query Layer?)</li>
+<li> raster support</li>
+<li> DB Manager is the future?</li>
+</ul>
+<h2>OSM Plenary</h2>
+<ul>
+<li>England combined vehicle time tracking to a map</li>
+<li>State of the Map, an OSM convention</li>
+<li>OSM Foundation<ul>
+  <li>legal entity</li>
+  <li>maintains servers</li>
+  </ul>
+  </li>
+<li>Sweet visual at itoworld.com</li>
+<li>OSM is about zoo mapping! ( also other things :)</li>
+<li>Wheel chair routing</li>
+<li>Address Hunter<ul>
+  <li>address scavenger hunt game, multiplayer, find &amp; take photo</li>
+  </ul>
+  </li>
+</ul>
+<h2>FCC Plenary</h2>
+<ul>
+<li>Communications is 7% of national GDP</li>
+<li>Time to market is #1 most important issue</li>
+<li>Obama issued Open Data Initiative</li>
+<li>Congress required data to be searchable</li>
+<li>FCC built REST services for block level data</li>
+<li>Pew Internet Research</li>
+<li>Intern threw together a mobile geolocation internet provider search on github quickly</li>
+</ul>
+<h2>MapServer status</h2>
+<ul>
+<li>map server is old (project in mid-90s)</li>
+<li>6.0 release with 6.0.1 security fix (upgrade!)<ul>
+  <li>rendering plugin API<ul>
+    <li>original was GD (8-bit gif)</li>
+    <li>4 graphic backends shipping in 6 including OpenGL</li>
+    </ul>
+  </li>
+  <li>expression parser rewrite</li>
+  <li>auto clustering, e.g., [6] graphic is six features, zoom in to see</li>
+  <li>built-in OpenLayers previewer</li>
+  <li>lots of WCS improvements, 2.0 support</li>
+  <li>multiple label styles per layer/shape, e.g., highway names and shields</li>
+  </ul>
+  </li>
+<li>25 source commiters, 13 PSC members (project steering committee)</li>
+<li>OSGeo project</li>
+<li>next<ul>
+  <li>wfs-t support to postgis</li>
+  <li>built-in caching (MapCache) based on mod-geocache</li>
+  <li>svg symbol definitions (there's an RFC, but which one?)</li>
+  <li>auto-projection (also has an rfc, but which one?)</li>
+  <li>by "RFC" he means OSGeo-specific RFC proecess?</li>
+  </ul>
+  </li>
+</ul>
+<h2>State of GeoTools</h2>
+<ul>
+<li>actively committed project</li>
+<li>keeping up with bug reports</li>
+<li>dropped the 2. from version number 2.8 =&gt; GeoTools 8</li>
+<li>lots of doc updates<ul>
+  <li>live code examples</li>
+  <li>100,000 words</li>
+  </ul>
+  </li>
+<li>referencing subsystem updated<ul>
+  <li>more projections</li>
+  </ul>
+  </li>
+<li>new vector data support: csv, directory of shapefiles</li>
+<li>new raster support: GeoTIFF, JP2, GRASS</li>
+<li>improved database driver<ul>
+  <li>prepared statements</li>
+  </ul>
+  </li>
+<li>new DirectLayer to write your own paint function</li>
+<li>StyleBuilder to help create SLD</li>
+<li>plugin will render custom SDL xml using your own Java code</li>
+<li>new transformation process for rendering or geometry processing</li>
+<li>process engine about to graduate to core functionality</li>
+<li>can now hook into Terradata data store</li>
+<li>temporal support</li>
+<li>query improvements<ul>
+  <li>supporting joins in WFS queries</li>
+  </ul>
+  </li>
+</ul>
+<h2>MapServer coverage support</h2>
+<ul>
+<li> no one here is regularly using the coverage service</li>
+<li> wcs 2.0 standard is only a few months old</li>
+<li> three requests: GetCaps, DescribeCoverage, GetCoverage</li>
+<li> prereq: proj4, gdal, libxml2</li>
+<li> same format as layer in mapfile</li>
+<li> mapserver reads many coverage metadata attributes but none are required</li>
+</ul>
+<h2>Tile generation with Mapnik &amp; Node.js</h2>
+<ul>
+<li>open source version of fusion table</li>
+<li>CartoDB = tiler + Carto CSS + spatial SQL api + OAuth + UI</li>
+<li>view/edit data in UI via grid</li>
+<li>view/edit data on map via mouse &amp; hover &amp; drag</li>
+<li>live SQL query filter on map interface</li>
+<li>PostGIS on the back end for demo</li>
+<li>add columns on the table UI</li>
+<li>helps move some mapping back to server, mix with vector on the client</li>
+<li>Oops, "we wrote a map server"</li>
+<li>Amazon's main site is made from 300+ calls to 100+ HTTP APIs</li>
+<li>Tired of large map servers</li>
+<li>cute evented system example of boiling water for tea and going to the door to get a package</li>
+<li>no problems with the Mapnik stack</li>
+<li>github/Vizzuality</li>
+</ul>
+<h2>Mapnik2GeoTools</h2>
+<ul>
+<li>mapnik definition</li>
+<li>mapquest's map design has 20 pages of styles, class breaks, etc.</li>
+<li>wrote a parser to export OGC filter XML</li>
+<li>put shapefiles &amp; tiffs in data directory for geoserver</li>
+<li>process<ul>
+  <li>run tool</li>
+  <li>open Mapnik file</li>
+  <li>click Convert!</li>
+  <li>look at output SLD file</li>
+  </ul>
+  </li>
+<li>vendor mapnik option support varies</li>
+<li>misc<ul>
+  <li>css has a different rendering model in geoserver, harder to convert from Mapnik</li>
+  <li>see also: mapnik distiller</li>
+  </ul>
+  </li>
+<li>github/dwins/mapnik2geotools</li>
+</ul>
+        <!--<h2>
+          Round trip</h2>-->
+      </div>
+      <div id="tags">
+        <ul>
+          <li>
+            <a href="http://twitter.com/#search?q=foss4g">foss4g</a>
+          </li>
+        </ul>
+      </div>
+      <div id="comments">
+        <h2>
+          Comments</h2>
+        <div id="disqus_thread"></div>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'trippingthebits'; // required: replace example with your forum shortname
+
+    // The following are highly recommended additional parameters. Remove the slashes in front to use.
+    var disqus_identifier = 'ttb_foss4g2011';
+    var disqus_url = 'http://trippingthebits.com/foss4g2011/';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26113662-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s)
+    } (document, 'script'));
+  </script>
+</body>
+</html>

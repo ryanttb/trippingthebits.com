@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html manifest="loved.appcache">
+<head>
+  <meta charset="utf-8">
+  <title>you are loved, laura, wherever you go</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="you are loved, laura, wherever you go">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+  <div>
+    <div id="map">
+      <div class="info">
+        <h1>you are loved, laura, wherever you go <img alt="" src="img/ajax-loader.gif" /></h1>
+      </div>
+    </div>
+  </div>
+  <script src="js/jquery-1.7.1.min.js"></script>
+  <script src="js/jquery.geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var map = null;
+
+      function setPosition( center ) {
+        $( "h1 img" ).remove( );
+
+        var geo = {
+              type: "Point",
+              coordinates: center || [ -71.10152, 42.344351 ]
+            };
+
+        if ( ! map ) {
+          // create a map
+          map = $( "#map" ).geomap( {
+            center: geo.coordinates,
+            zoom: 15,
+            pannable: false,
+            scroll: "off",
+            cursors: {
+              pan: "default"
+            },
+            shapeStyle: {
+              width: 0,
+              height: 0
+            },
+            dblclick: function( e, geo ) {
+              e.preventDefault( );
+            }
+          } ).geomap( "append", geo, null, '<div class="heart"></div>' );
+        } else if ( center ) {
+          map.geomap( "empty", false );
+          map.geomap( "append", geo, null, '<div class="heart"></div>', false );
+          map.geomap( "option", "center", center );
+        }
+      }
+
+      if ( navigator.geolocation ) {
+        navigator.geolocation.watchPosition( function ( p ) {
+          setPosition( [ p.coords.longitude, p.coords.latitude ] );
+        }, function (error) {
+          setPosition( );
+        }, {
+          maximumAge: 10000
+        });
+      } else {
+        setPosition( );
+      }
+    });  
+  </script>
+</body>
+</html>

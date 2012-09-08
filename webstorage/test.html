@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>webStorage Test</title>
+</head>
+<body>
+  <h1>
+    webStorage Test</h1>
+  <p>
+    This page tests my webStorage plugin.</p>
+  <p>
+    The following table tests the presence of any form of webStorage through our plugin.</p>
+  <table>
+    <tr>
+      <th>
+        session
+      </th>
+      <th>
+        local
+      </th>
+    </tr>
+    <tr>
+      <td data-text="hasSession">
+      </td>
+      <td data-text="hasLocal">
+      </td>
+    </tr>
+  </table>
+  <h2>
+    Simple strings</h2>
+  <h3>
+    Session</h3>
+  <p>
+    This section will allow you to save and restore a string value to session storage.
+  </p>
+  <input type="text" id="txtSessionStringKey" value="foo" />
+  <input type="text" id="txtSessionStringValue" />
+  <input type="button" id="cmdSessionStringSave" value="Save" />
+  <input type="button" id="cmdSessionStringLoad" value="Load" />
+  <input type="button" id="cmdSessionStringClearValue" value="Clear input" />
+  <input type="button" id="cmdSessionStringClearStorage" value="Clear storage" />
+  <h3>
+    Local</h3>
+  <div>
+  <p>
+    This section will allow you to save and restore a string value to local storage if it's available.</p>
+  <input type="text" id="txtLocalStringKey" value="foo" />
+  <input type="text" id="txtLocalStringValue" />
+  <input type="button" id="cmdLocalStringSave" value="Save" />
+  <input type="button" id="cmdLocalStringLoad" value="Load" />
+  <input type="button" id="cmdLocalStringClearValue" value="Clear input" />
+  <input type="button" id="cmdLocalStringClearStorage" value="Clear storage" />
+  </div>
+  <div>
+    <input type="button" id="cmdLocalDump" value="Dump Storage" /> (click to dump all key/value pairs in storage)
+    <div id="pnlLocalDump">
+    </div>
+  </div>
+  <h2>
+    Objects</h2>
+  <h3>
+    Session</h3>
+  <p>
+    This section will allow you to save and restore an object to session storage. This dangerous <b>example</b> will call eval on the text you enter and store the object.
+  </p>
+  <input type="text" id="txtSessionObjectKey" value="objKey" />
+  <textarea id="txtSessionObjectValue" cols="32" rows="5"></textarea>
+  <input type="button" id="cmdSessionObjectSave" value="Save" />
+  <input type="button" id="cmdSessionObjectLoad" value="Load" />
+  <input type="button" id="cmdSessionObjectClearValue" value="Clear input" />
+  <input type="button" id="cmdSessionObjectClearStorage" value="Clear storage" />
+  <h3>
+    Local</h3>
+  <p>
+    This section will allow you to save and restore an object to local storage if it's available. This dangerous <b>example</b> will call eval on the text you enter and store the object.</p>
+  <input type="text" id="txtLocalObjectKey" value="objKey" />
+  <textarea id="txtLocalObjectValue" cols="32" rows="5"></textarea>
+  <input type="button" id="cmdLocalObjectSave" value="Save" />
+  <input type="button" id="cmdLocalObjectLoad" value="Load" />
+  <input type="button" id="cmdLocalObjectClearValue" value="Clear input" />
+  <input type="button" id="cmdLocalObjectClearStorage" value="Clear storage" />
+
+  <h2 id="maxsize">Max size</h2>
+  <h3>Session</h3>
+  <p>Click this button to attempt to determine the max size allowed by storage. The upper limit of the test is 100MB. Note that your session storage will be cleared and that this may take some time and thrash your harddrive.</p>
+  <button id=cmdSessionMax type=button>Max out</button>
+  <div id=pnlSessionMax>
+    <p>Example output:</p>
+    <pre>==Chrome 6==
+storage length: 2609152 bytes
+Error: QUOTA_EXCEEDED_ERR: DOM Exception 22
+
+message: QUOTA_EXCEEDED_ERR: DOM Exception 22
+name: QUOTA_EXCEEDED_ERR
+code: 22
+
+==Firefox 3.6==
+Successfully stored 100MB
+
+==Safari 5==
+Successfully stored 100MB
+
+==Opera 10.5==
+Successfully stored 100MB
+
+==IE 8==
+storage length: 4976640 bytes
+Error: Not enough storage is available to complete this operation. 
+
+number: -2147024882
+description: Not enough storage is available to complete this operation. 
+message: Not enough storage is available to complete this operation.</pre>
+  </div>
+  <h3>Local</h3>
+  <p>Click this button to attempt to determine the max size allowed by storage. The upper limit of the test is 100MB. Note that your local storage will be cleared and that this may take some time and thrash your harddrive. Also note that Firefox takes a very long time.</p>
+  <button id=cmdLocalMax type=button>Max out</button>
+  <div id=pnlLocalMax>
+    <p>Example output:</p>
+    <pre>==Chrome 6 &amp; Android==
+storage length: 2609152 bytes
+Error: QUOTA_EXCEEDED_ERR: DOM Exception 22
+
+message: QUOTA_EXCEEDED_ERR: DOM Exception 22
+name: QUOTA_EXCEEDED_ERR
+code: 22
+
+==Firefox 3.6==
+storage length: 5218304 bytes
+[Exception... "Persistent storage maximum size reached" code: "1014" nsresult: "0x805303f6 (NS_ERROR_DOM_QUOTA_REACHED)" location: "http://csh.rit.edu/~ryanw/chaos/WebStorageTest.html Line: 228"]
+
+==Safari 5==
+storage length: 2609152 bytes
+Error: QUOTA_EXCEEDED_ERR: DOM Exception 22
+
+line: 255
+sourceId: 2145080424
+sourceURL: http://csh.rit.edu/~ryanw/chaos/WebStorageTest.html
+code: 22
+message: QUOTA_EXCEEDED_ERR: DOM Exception 22
+name: QUOTA_EXCEEDED_ERR
+
+==Opera 10.5 (if you reject the more storage request)==
+storage length: 1944576 bytes
+Error: QUOTA_EXCEEDED_ERR
+
+message: QUOTA_EXCEEDED_ERR
+code: 22
+
+==Opera 10.5 (if you allow Unlimited on more storage request)==
+Successfully stored 100MB
+
+==IE 8 (consumes 100% CPU core after test ends)==
+storage length: 4966400 bytes
+Error: Not enough storage is available to complete this operation. 
+
+number: -2147024882
+description: Not enough storage is available to complete this operation. 
+message: Not enough storage is available to complete this operation.</pre>
+  </div>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+
+  <script type="text/javascript" src="jquery.webStorage.js"></script>
+
+  <script type="text/javascript">
+    $(function() {
+      if ($.webStorage.session({ allowWindowName: true }) != null) {
+        $("[data-text=hasSession]").text("yes");
+
+        $("#cmdSessionStringSave").click(function() {
+          if ($("#txtSessionStringKey").val()) {
+            $.webStorage.session().setItem($("#txtSessionStringKey").val(), $("#txtSessionStringValue").val());
+          } else {
+            alert("Please enter a key");
+          }
+        });
+
+        $("#cmdSessionStringLoad").click(function() {
+          if ($("#txtSessionStringKey").val()) {
+            $("#txtSessionStringValue").val($.webStorage.session().getItem($("#txtSessionStringKey").val()));
+          } else {
+            alert("Please enter a key");
+          }
+        }).click();
+
+        $("#cmdSessionStringClearValue").click(function() {
+          $("#txtSessionStringValue").val("");
+        });
+
+        $("#cmdSessionStringClearStorage").click(function() {
+          $.webStorage.session().clear();
+        });
+
+        $("#cmdSessionObjectSave").click(function() {
+          if ($("#txtSessionObjectKey").val()) {
+            var valObj = eval("(" + $("#txtSessionObjectValue").val() + ")");
+            $.webStorage.session().setItem($("#txtSessionObjectKey").val(), valObj);
+          } else {
+            alert("Please enter a key");
+          }
+        });
+
+        $("#cmdSessionObjectLoad").click(function() {
+          if ($("#txtSessionObjectKey").val()) {
+            var valObj = $.webStorage.session().getItem($("#txtSessionObjectKey").val());
+            for (var prop in valObj) {
+              if (valObj.hasOwnProperty(prop)) {
+                alert(prop + ": " + valObj[prop]);
+              }
+            }
+          } else {
+            alert("Please enter a key");
+          }
+        }).click();
+
+        $("#cmdSessionObjectClearValue").click(function() {
+          $("#txtSessionObjectValue").val("");
+        });
+
+        $("#cmdSessionObjectClearStorage").click(function() {
+          $.webStorage.session().clear();
+        });
+
+        $("#cmdSessionMax").click(function() {
+          if ("sessionStorage" in window) {
+            var oneK = "################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################";
+            window.sessionStorage.clear();
+            try {
+              for (var i = 0; i < 100000; i++) {
+                window.sessionStorage.setItem("v" + i, oneK);
+              }
+            } catch (e) {
+              var result = "storage length: " + window.sessionStorage.length * 1024 + " bytes<br>" + e.toString() + "<br><br>";
+              for (var key in e) {
+                if (e.hasOwnProperty(key)) {
+                  result += key + ": " + e[key] + "<br>";
+                }
+              }
+
+              $("#pnlSessionMax").html(result);
+            }
+            if (i == 100000) {
+              $("#pnlSessionMax").html("Successfully stored 100MB");
+            }
+            $.webStorage.session().clear();
+            return false;
+          } else {
+            $("#pnlSessionMax").text("This test is only for real HTML5 sessionStorage, which your browser does not support.");
+          }
+        });
+       } else {
+        $("[data-text=hasSession]").text("no");
+      }
+
+      if ($.webStorage.local() != null) {
+        $("[data-text=hasLocal]").text("yes");
+
+        $("#cmdLocalStringSave").click(function() {
+          if ($("#txtLocalStringKey").val()) {
+            $.webStorage.local().setItem($("#txtLocalStringKey").val(), $("#txtLocalStringValue").val());
+          } else {
+            alert("Please enter a key");
+          }
+        });
+
+        $("#cmdLocalStringLoad").click(function() {
+          if ($("#txtLocalStringKey").val()) {
+            $("#txtLocalStringValue").val($.webStorage.local().getItem($("#txtLocalStringKey").val()));
+          } else {
+            alert("Please enter a key");
+          }
+        }).click();
+
+        $("#cmdLocalStringClearValue").click(function() {
+          $("#txtLocalStringValue").val("");
+        });
+
+        $("#cmdLocalStringClearStorage").click(function() {
+          $.webStorage.local().clear();
+        });
+
+        $("#cmdLocalObjectSave").click(function() {
+          if ($("#txtLocalObjectKey").val()) {
+            var valObj = eval("(" + $("#txtLocalObjectValue").val() + ")");
+            $.webStorage.local().setItem($("#txtLocalObjectKey").val(), valObj);
+          } else {
+            alert("Please enter a key");
+          }
+        });
+
+        $("#cmdLocalObjectLoad").click(function() {
+          if ($("#txtLocalObjectKey").val()) {
+            var valObj = $.webStorage.local().getItem($("#txtLocalObjectKey").val());
+            for (var prop in valObj) {
+              if (valObj.hasOwnProperty(prop)) {
+                alert(prop + ": " + valObj[prop]);
+              }
+            }
+          } else {
+            alert("Please enter a key");
+          }
+        }).click();
+
+        $("#cmdLocalObjectClearValue").click(function() {
+          $("#txtLocalObjectValue").val("");
+        });
+
+        $("#cmdLocalObjectClearStorage").click(function() {
+          $.webStorage.local().clear();
+        });
+
+        $("#cmdLocalDump").click(function() {
+          var localData = "";
+          for (var i = 0; i < $.webStorage.local().length; i++) {
+            var key = $.webStorage.local().key(i);
+            localData += key + ": " + $.webStorage.local().getItem(key) + "<br>";
+          }
+          $("#pnlLocalDump").html(localData);
+
+        });
+
+        $("#cmdLocalMax").click(function() {
+          if ("localStorage" in window) {
+            var oneK = "################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################################";
+            window.localStorage.clear();
+            try {
+              for (var i = 0; i < 100000; i++) {
+                window.localStorage.setItem("v" + i, oneK);
+              }
+            } catch (e) {
+              var result = "storage length: " + window.localStorage.length * 1024 + " bytes<br>" + e.toString() + "<br><br>";
+              for (var key in e) {
+                if (e.hasOwnProperty(key)) {
+                  result += key + ": " + e[key] + "<br>";
+                }
+              }
+
+              $("#pnlLocalMax").html(result);
+            }
+
+            if (i == 100000) {
+              $("#pnlLocalMax").html("Successfully stored 100MB");
+            }
+            $.webStorage.local().clear();
+          } else {
+            $("#pnlLocalMax").text("This test is only for real HTML5 localStorage, which your browser does not support.");
+          }
+        });
+      } else {
+        $("[data-text=hasLocal]").text("no");
+      }
+    });
+  </script>
+
+</body>
+</html>
+

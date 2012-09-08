@@ -1,0 +1,289 @@
+﻿html {
+  font-size: 100%;
+  overflow-y: scroll;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+body {
+  background-color: #a7d3d3;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.231;
+  text-align: center;
+}
+
+body, button, input, select, textarea {
+  font-family: sans-serif;
+  color: #222;
+}
+
+pre {
+  /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
+  white-space: pre; white-space: pre-wrap; word-wrap: break-word;
+  padding: 15px;
+}
+
+h1
+{
+  color: #972F4E;
+  font-size: 2rem;
+  margin-bottom: .75rem;
+  margin-top: .75rem;
+}
+
+h2
+{
+  font-size: 1.25rem;
+  margin-bottom: .5rem;  
+  margin-top: .5rem;
+  color: #E890AA;
+}
+
+h3
+{
+  color: #AE7C8B;
+  margin-bottom: .25rem;  
+  margin-top: .25rem;  
+  margin-left: .5rem;
+}
+
+p
+{
+  line-height: 1.2rem;
+  margin-top: .6rem;
+  margin-bottom: .6rem;
+}
+
+th,td
+{
+  padding: 2px;
+}
+
+ol,ul
+{
+  padding: 4px 0 4px 0;
+  margin-left: 32px;
+}
+
+ol>li
+{
+  list-style-type: decimal;
+}
+
+ul>li
+{
+  list-style-type: disc;
+}
+
+li, dd
+{
+  margin-top: .25rem;
+  margin-bottom: .25rem;
+}
+
+dt
+{
+  font-weight: bold;
+}
+
+/* code formatted by http://manoli.net/csharpformat/ */
+
+code>pre
+{
+  margin: 1rem;
+  background-color: #FFF2CA;
+  padding: .5rem;
+  border: dashed 2px #A68933;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+}
+
+cde>pre .kwrd
+{
+  color: #972F4E;
+  font-weight: bold;
+}
+
+code>pre .str, .csharpcode .type
+{
+  color: #226D6D;
+  font-weight: bold;
+}
+
+time
+{
+  font-style: italic;
+  font-size: .8rem;
+  margin: .4rem;
+}
+
+blockquote
+{
+  margin-left: 2rem;
+  margin-right: 2rem;
+  border-left: solid 3px #A68933;
+  padding-left: 8px;
+}
+
+#identity
+{
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+#identity a:after
+{
+  content: " . . .";
+}
+
+#contact
+{
+  position: fixed;
+  left: 4px;
+  top: 64px;
+}
+
+#contact>a
+{
+  padding-top: 4px;
+  width: 24px;
+  height: 20px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  display: block;
+}
+
+#twitter
+{
+  background-color: #33ccff;
+  color: #fdfdfd;
+}
+
+#facebook
+{
+  background-color: #3b5998;
+  color: #fdfdfd;
+  text-align: right;
+  padding-right: 4px;
+  width: 20px !important;
+}
+
+#email
+{
+  font-size: .8rem;
+  background-color: #fdfdfd;
+  color: #111;
+}
+
+#identity
+{
+  z-index: -1;
+}
+
+#identity>a,#identity>a:visited
+{
+  font-size: 2.5rem;
+  text-decoration: none;
+  color: #5A7E7E;
+}
+
+#frame
+{
+  position: absolute;
+  left: 48px;
+  top: 48px;
+  right: 48px;
+  min-width: 640px;
+  z-index: 100;
+}
+
+#frame>div
+{
+  background-color: #fefefe;
+  text-align: left;
+  padding: 16px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  margin-bottom: 48px;
+}
+
+#frame a
+{
+  color: #97D3D3;
+  font-weight: 600;
+  padding: 0 4px 0 4px;
+  text-decoration: none;
+}
+
+#frame a:visited
+{
+  text-decoration: none;
+  color: #AE7C8B;
+}
+
+#frame a:hover
+{
+  background-color: #68A8A8;
+  color: #97D3D3;
+}
+
+#content
+{
+  line-height: 1.05rem;
+}
+
+.fancyButton
+{
+  background-color: #AE7C8B;
+  border: solid 2px #972F4E;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  color: #fdfdfd;
+}
+
+.fancyButton:hover
+{
+  background-color: #E890AA;
+}
+
+#tags>ul>li
+{
+  display: inline;
+  font-size: .8rem;
+  margin-right: 8px;
+}
+
+#share
+{
+  list-style-type: none;
+}
+
+#share li
+{
+  display: inline-block;
+  margin: 0 1rem;
+  max-width: 25%;
+}
+
+.dsq-global-toolbar-left
+{
+  display: none;
+}
+
+@media print
+{
+#identity
+{
+  display: none;
+}
+}

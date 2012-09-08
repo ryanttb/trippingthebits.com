@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head lang="en-us">
+  <title>Joined &amp; related tables in ArcMap</title>
+  <link href="styles/default.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div id="identity">
+    <a href="index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="facebook" href="http://www.facebook.com/westphal">f</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          Joined &amp; related tables in ArcMap</h1>
+        <time>2009-12-18</time>
+        <p>
+          This story does not yet have a happy ending.</p>
+        <p>
+          This month I attempted to improve the speed of one of my mapping websites. What should be an almost instantaneous <code>DISTINCT</code> query on SQL Server is taking over three minutes to execute against <a href="http://www.esri.com/software/arcgis/arcgisserver/index.html">ArcGIS Server</a>. I need to figure out why and my first task was to dig into what&#39;s going on behind the server. Specifically, this means a map document authored by ArcMap.</p>
+        <img alt="The Join Data dialog in ArcMap" src="images/JoinedAndRelatedTablesInArcMap.JoinData.png" style="float: right;" title="The ArcMap Join Data dialog lets you join on one field and gives you one additional option." />
+        <p>
+          As far as I can tell, a common design in GIS is to keep spatial data (which you can draw on a map or query based on its location on Earth) and most of the regular attribute data separate. This way, you can edit the attribute data with software that doesn&#39;t need or want to worry about location information. When you want to connect the attribute data in one table to a feature layer in ArcMap you can join the table in by connecting fields. I believe the options here are similar to a <code>LEFT OUTER JOIN</code> and an <code>INNER JOIN</code> in SQL.</p>
+        <p>
+          The ArcMap help documentation says that joining is for a one-to-one connection. Each shape can only match one record in the joined table. That does make sense but I cannot attest to the speed of that particular situation because my data is not one-to-one. I am working with parcels and property data. The property data has condos and more than one condo record reference a single shape.</p>
+        <p>
+          My first mistake is that I wrongly used join when my connection is not one-to-one. However, I feel as though ArcMap could have warned me that:</p>
+        <ol>
+          <li>
+            I should not be using join</li>
+          <li>
+            Since I&#39;m using it anyway, a query based on the joined table, e.g., &quot;give me all the parcels with this street name,&quot; may take a very long time to complete</li>
+        </ol>
+        <p>
+          Performing that query directly in ArcMap takes the same amount that I see in the website, therefore, the website code and the ArcGIS Server SOAP API are not the culprit. Now I have to find out how to speed up ArcMap.</p>
+        <p>
+          Joining tables, as opposed to relating them which I will get into in a bit, has the very useful outcome of appending all of the table&#39;s columns to the layer&#39;s fields. The layer acts as if the table is part of the original feature class. This greatly simplifies programming and I want to keep things that way.</p>
+        <h2>
+          Index</h2>
+        <p>
+          If database queries are running slowly you can create a indicies on the columns involved to help. ArcMap calls </p>
+        <h2>
+          One-to-one</h2>
+        <p>
+          My second plan was to make the data one-to-one. That&#39;s not so hard on the database-side. All I have to do is eliminate the actual condo property rows. Each condo usually has a condo <i>main</i> with a zero in the Unit column. Regular, non-condo properties also have a Unit of zero. This particular application does not directly need to know about condos. To make the data so that one parcel polygon matches exactly one property record, I need to only use properties where <code>Unit = &#39;0&#39;</code>. There are a few ways to do this and the following sections explain my attempts to speed up queries on external tables in ArcMap.</p>
+        <h3>
+          No join conditions</h3>
+        <p>
+          Joining a table in ArcMap performs a SQL-like join. Unlike SQL, you cannot add additional conditions. For example, if I want to inner join two tables in SQL on a field but limit the data joined in, I can.</p>
+        <code><pre><span class="kwrd">SELECT</span> * <span class="kwrd">FROM</span> Parcels
+  <span class="kwrd">INNER</span> <span class="kwrd">JOIN</span> CAMA <span class="kwrd">ON</span> Parcels.MAP_LOT = CAMA.MAP_LOT <span class="kwrd">AND</span> CAMA.Unit = <span class="str">'0'</span>
+  <span class="kwrd">WHERE</span> CAMA.StreetName = <span class="str">'MAIN ST'</span></pre></code>
+        <p>
+          With ArcMap&#39;s user interface, I can only say on which field to join. I cannot add criteria to make the joined table one-to-one with the layer. Moving on.</p>
+        <h3>
+          Setting a definition query on the table</h3>
+        <p>
+          When you bring a table into ArcMap, it shows up in the [what&#39;s that tab called, Source?] tab. You can set some properties just like a layer, such as a definition query. I thought that if I set a definition query of <code>Unit = &#39;0&#39;</code> on the table in ArcMap,&nbsp;my data would act as one-to-one, I can join the table to the parcel layer and my street name query would be normal speed. This is not the case. In ArcMap, when you have a table with a definition query, and you join that table to a layer you get a dialog like this asking if you want to copy the definition query to the layer.</p>
+        <img alt="ArcMap asking about an attribute index" src="images/JoinedAndRelatedTablesInArcMap.JoinIndex.png" />
+        <p>
+          If you choose not to copy the definition query, ArcMap acts as if the filter doesn&#39;t exist when dealing with the layer. If you choose to go ahead with the copy, the definition query appears to be applied afterward. Queryies on the joined table are still slow.</p>
+        <h3>
+          Database view does not help</h3>
+        <p>
+          My last attempt to get join working was to create a view on the database with the <code>Unit = &#39;0&#39;</code> restriction already applied.</p>
+        <p>
+          It turns out that you can add a database view to ArcMap. I had previously thought that only tables were allowed. However, even joining the view to the Parcels layer did not speed up a simple query on the joined data.</p>
+        <h2>
+          Giving up on join</h2>
+        <p>
+          Since joining the table isn&#39;t working I thought I should try the other option and set the CAMA table as a related table. Related tables in ArcMap are designed for a one-to-many data. However, relating a table does not give you the benifit of appended attributes. I thought that if I were doing things correct on the server given the data, i.e., using relate instead of join, I could figure the rest out in code.</p>
+        <p>
+          I set the full CAMA table as a related table to the Parcels layer and published the map to ArcGIS Server. My plan was to get a reference to the related table somehow and query that for the house numbers given a street name. Before I even had a chance to write some code, I looked up how to access a related table through ArcGIS Server&#39;s SOAP API. The following line is at the end of the QueryFeatureData method on MapServer.</p>
+        <blockquote>
+          Joins established in the source map (one-to-one and many-to-one) are supported using this method. Relates are not supported (one-to-many and many-to-many).</blockquote>
+        <p>
+          Join now has another advantage, it is available through the SOAP API. I have no easy way to get to my related table with ArcGIS Server.</p>
+        <h2>
+          Giving up on map services</h2>
+        <p>
+          Join is performing too slow and relate is not easilly available. A goal of this project was to leave all data configuration up to the map author. At the moment, I do not think that&#39;s possible. I&#39;m going to have to add a connection string to the underlying database and go at it directly. This means more configuration work for each client and more work for the programmer.</p>
+        <ul>
+          <li>
+            The client will need to setup both a connection to ArcGIS Server and a connection to a database</li>
+          <li>
+            The application will need to know which layer contains Parcels, which table contains CAMA data and which fields link the two</li>
+          <li>
+            The programmer will have to perform attribute queries on the database first and then query ArcGIS Server for the geometry data seperately</li>
+        </ul>
+        <p>
+          This seems like an awful lot of setup for a simple attribute query but I have not been able to find a way around the ArcMap speed issue.</p>
+        <h2>
+          Is it just me?</h2>
+        <p>
+          I am still not 100% convinced that I can blame join for ArcMap&#39;s slow queries. When I first decided to test joining a database view, and saw that ArcMap does in fact allow the user to add views to a map I thought my problem was solved. A lack of change in speed for that test was the most surprising result of them all. If I successfully made the data one-to-one behind the scenes, why didn&#39;t the query speed improve?</p>
+        <p>
+          Even though this particular project will not allow me to setup a new database table I want to try it anyway and compare a true one-to-one table&#39;s query speed with my other results. I&#39;ll update this post if I learn any new techniques or the real issue behind this problem.</p>
+        <h2>
+          Round trip</h2>
+      </div>
+      <div id="tags">
+        <ul>
+          <li>
+            <a href="http://twitter.com/#search?q=%23GIS">GIS</a></li>
+        </ul>
+      </div>
+      <div id="comments">
+        <h2>
+          Comments</h2>
+        <form action="comment.php" method="post">
+          <table>
+            <tbody>
+              <tr>
+                <th>
+                  <label for="commentDisplayName">
+                    Name</label>
+                </th>
+                <td>
+                  <input type="text" id="commentDisplayName" name="displayName" size="32" />
+                </td>
+              </tr>
+              <tr>
+                <th>
+                  <label for="commentWebsite">
+                    URL</label>
+                </th>
+                <td>
+                  <input type="text" id="commentWebsite" name="website" size="32" />
+                </td>
+              </tr>
+              <tr>
+                <th>
+                  <label for="commentText">
+                    Comment</label>
+                </th>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <textarea id="commentText" name="comment" rows="5" cols="36"></textarea>
+                </td>
+              </tr>
+              <tr>
+                <td id="commentCommands" colspan="2">
+                  <input type="hidden" id="commentEntry" name="entry" />
+                  <input type="submit" id="commentSend" value="Send" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

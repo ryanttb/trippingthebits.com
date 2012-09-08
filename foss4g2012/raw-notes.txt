@@ -1,0 +1,197 @@
+4-5 claim table in west salon for 5pm coctail reception
+
+breakdown tomorrow at 4pm
+they can lock stuff up for us at convention center if we need it
+
+## PostgreSQL
+
+* PostgreSQL 9.2 in about september
+
+### features
+
+* many geeky performance updates
+* index-only scans will affect spatial data the most
+** new visiblilty map: in-memory bitmap of data currently loaded
+** takes 1% as long as getting this info from the physical table (heap)
+* read/write scalability; better support for cloud hosting
+* cascading replication & other replication improvements
+* multi-master replication, hopefully in 9.3
+** "I don't know how it's going to happen, but it has to."
+* we love "weird data", e.g., spatial data
+* new weird data in 9.2 is JSON!!!!
+** JSON <==> Hstore for indexed JSON!
+* write views in JavaScript!
+* spatial index directly in PostgreSQL, should (will?) be used in PostGIS 2.1
+
+## CartoDB
+
+* presented by: https://twitter.com/#!/jatorre
+* some new, awesome apps using CartoDB
+* CartoDB demo
+** download wifi hotspot data from NYC OpenData
+* support different data types (spoke too fast), zipped shape files
+* drag & drop from desktop
+* I wonder if they fixed the issue where uploading a .geojson export from QGIS failed
+* can edit geometry when designing map
+** individual vertex editing for polygons
+* style with CartoCSS
+* uses new PostGIS 2.0 already
+* can query for styled tiles with "Maps API"; style query string argument
+* can query for actual data with "SQL API"
+* can use new PostgreSQL index nearest query
+* "I have seen the future and it is not made of tiles"
+** I would say: not only made of tiles
+* 8 Bic map demo looks great!
+* open source; they make money from tiered hosting plans
+** free tier
+* can import OSM data
+
+## MapBox
+
+* presented by: @tmcw
+* presentation is here: ds.io/boyond-maps
+* Google "begat" Maps API because people were creating their own mashups by hand
+* open source options adopt big software company's interface to help with conversion
+* google helped change mapping
+** tiles don't need to reload
+** cartography: not all roads need to be shown
+* start thinking in frames per second
+* eliminate old ideas users don't care about: scale bar
+* users can make/design maps with greater detail than any company (including MapBox)
+
+## Panel
+
+### ui/ux
+
+* why does the interface suck?
+* the more stuff your product does, the more complicated the ui has to better
+* we have to get designers involved because we're software engineers
+* is $1M the price of a good UI?
+
+### community
+
+* different models of open source: just people, individual companies, etc.
+
+## OpenLayers
+
+* github gives credit to more contributors
+* good mobile support
+* tile animation
+* new Zoom control (only +/- buttons)
+* nice accessability features
+* writes tiles to localStorage?
+** do they know there's not much space for that? Can we shut it off?
+* the important part about HTML5 is that you think it's cool
+* UTFGrid integration
+* continuous zooming
+** does it switch to higher tile zoom (and scale backwards) at a middle threshold?
+* improved APIs
+** can pass plain objects to some functions
+* can abort tiles
+* OpenLayers is the cat
+** "There's some question about the size of the cat."
+* hosted build tool would be an improvement
+
+## OpenLayers in 3D
+
+* presented by: @pelicanmapping
+* original plugin didn't work in Chrome
+* nice 3D mountain demo
+* OpenLayers 2D to 3D with a click of a checkbox
+* GeoTIFF to encode elevation data = "home grown, JSON-encoded tile" = nice!
+
+## PostGIS 2.0
+
+* NOT backwards compatible
+** because serialize to disk is different
+* PostGIS 1 had unaligned data storage
+* new 3D functions: ST_3dDistance, etc.
+* new 3D types: triangle, tin
+* 3D index-based query: &&&
+* new PostGIS connection GUI
+** batch shapefile loading in the GUI
+** dump spatial tables to shapefiles
+* geometry data type can include geometry type, e.g., MultiPolygon, and SRID
+** can still use un-typed geometry table
+* better raster support
+** load raster with raster2pgsql command
+* join between raster and geometry tables?
+* rasters are large collections of tiny chips
+* rasters are for analysis, not visualization
+* can snap rows: ST_Snap "work in progress, but mostly works"
+* force features to valid: ST_MakeValid
+* nearest neighbor indexed searches
+** order by geom <-> ... limit 10
+
+## challenges
+
+### NYC
+* 200,000 employees in all agencies
+* moderate degree of specialization
+* low degree of colabaration between agencies
+* 17 developers/analysis in department
+* everything built internally, maintained internally
+* some apps have lived many, many years past their lifespan
+* Sara: part of group
+* in house mapping framework developed 4/5 years ago (open layers wasn't ready yet)
+** geoserver in that framework, as is geowebcache
+* app shows all streets that are closed, based on OpenGeo stack w/o PostGIS (because Oracle shop)
+* all components available for other city agencies on shared service environment
+* oracle not going away any time soon
+* many other commercial software to integrate
+** painful integration with SharePoint
+* "legacy solutions being built every day"
+* simple operations support doesn't need knowledge transfer, e.g., start/stop services
+* moving off of Solaris to RedHat Linux
+* first group in DoITT to move toward open source
+* it takes leadership to create adoption of open source
+* having a support model around an open source solution is "key"
+* legal issues do not exist, do it and apologize later
+** don't ask attornies unless you have to, they will find things
+* not "most interested" in any one part of OpenGeo stack
+** it's all about what the project needs and what best fits it
+* simulated the traffic hit while trying to generate new tiles, etl, etc. for snow removal app
+* concern is scalability
+** especially on "our antequated servers"
+* OpenGeo team came to help
+* would like to know what community wants from agencies like DoITT
+* biggest app to use OpenGeo is City Map 
+* most popular is snow plow app
+* see us continuing down the open source road
+* excited by projects out there
+* hopefully the agency follows along
+* getting open source software had to go through the same accreditation/security audits of all software
+
+### fcc group
+* brought on for national broadband map
+* many silos in fcc
+* focus on what we can do in the future
+* bb map introduced new technologies to fcc
+* agency has a lot of QGIS usage
+** people have come to it w/o thinking a GIS problem, but to look at data, e.g., census
+* use MapBox & TileMill for authoring Maps (publish all maps on fcc.gov)
+* legacy of experise, esp. in database
+* PostgreSQL wasn't mature enough at the time for some projects
+* idea of moving to more loosly-coupled systems
+* should be able to work from an API call instead of proprietary third party solution
+* open source developers used to doing a lot of system admin, usually have root access
+* now, ops admins don't let devs get too close to hardware
+* but devs are trying to push that boundary
+* internally, you need to cultivate change (to open source)
+* most users don't care if they're using open source, some seek it out
+* if there's a license that other agencies have used, then there's not much to worry about
+* PostGIS on a super computer can do a lot of analysis
+* didn't offer horizontal scaling that IT staff thought it could don
+* "OpenGeo team scrambled to support us"
+* likes that people want to build apps around government data
+* having open APIs is a way we give back
+* giving code back to the community is good (open sourced Drupal code for MapBox)
+* part of RFQs now mention that source must be put on public site like github
+* some good ideas snuck through with broadband map
+** fully RESTful
+** use OGC
+** app must use own API
+* would like to stop hosting own hardware
+* see us moving geoserver to cloud space
+* looking for OpenGeo to guide us
+* 

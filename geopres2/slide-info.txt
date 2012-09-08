@@ -1,0 +1,4 @@
+* if you want something between OpenLayers & Modest Maps
+** as powerful as OpenLayers, almost as small as Modest Maps (but we're gzipped & on a worldwide CDN)
+* a real web mapping application
+

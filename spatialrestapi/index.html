@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Spatial REST API</title>
+  <link href="../styles/default.css" rel="stylesheet" type="text/css" />
+  <style type="text/css">
+    pre { font-size: .9em; }
+  </style>
+</head>
+<body>
+  <div id="identity">
+    <a href="../index.html">Tripping the Bits</a>
+  </div>
+  <div id="contact">
+    <a id="twitter" href="http://twitter.com/ryanttb">t</a>
+    <a id="email" href="mailto:ryan@trippingthebits.com">@</a>
+  </div>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1>
+          Spatial REST API</h1>
+        <time>2011-06-17</time>
+        <p>There was news yesterday was that Esri is &quot;giving&quot; their REST API to Open Geospatial Consortium. While Esri&#39;s API is better than WMS queries, it's not perfect. It&#39;s also not the only option.</p>
+        <h2>It&#39;s not perfect</h2>
+        <h3>JSON does not make a good REST API</h3>
+        <p>I love JSON. It&#39;s a great web response format that can be parsed with hardware speed by modern web browsers. However, it is in no way geared toward being part of a clean REST API specification.</p>
+        <p>REST queries are typically based on URLs. A URL (or, more formally, URI) consists of three types of characters: <em>unreserved</em>, <em>reserved</em> and <em>other</em>.</p>
+        <p>You may type <em>unreserved characters</em> into the address bar of your favorite browser as-is and that&#39;s how they will be sent to the server.</p>
+        <p><em>Reserved characters</em> is a group of 18 characters divided into general delimiters:</p>
+        <pre>":", "/", "?", "#", "[", "]", "@"</pre>
+        <p>and sub delimiters:</p>
+        <pre>"!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "="</pre>
+        <p><em>Reserved characters</em> may sometimes need to be <a href="http://en.wikipedia.org/wiki/Percent-encoding">percent-encoded</a> before being sent to a web server.</p>
+        <p>When not used for their special purpose, most general delimiters require encoding. The exceptions are that the path portion of a URL can contain unencoded colon characters and the query portion can contain both colon and forward slash characters. The query portion can also contain the entire set of sub delimiters, unencoded.</p>
+        <p>All other characters are in the <em>other</em> group and must be percent-encoded.</p>
+        <p>Six of the eight special characters in the <a href="http://json.org/">JSON spec</a> (curly braces, square brackets, double quote, and back slash) either do not have an exception to encoding or fall into a URL&#39;s <em>other</em> group. This means they look ugly in a URL.</p>
+        <p>The browser will usually hide this ugliness from you if you type it in by hand or form an Ajax request in JavaScript, but when it&#39;s time to send that query to your web server, even if you remove all whitepace, your pretty GeoJSON polygon:</p>
+        <pre>{
+  "type": "Polygon",
+  "coordinates": [ [
+    [100.0, 0.0], [101.0, 0.0], [101.0, 1.0],
+    [100.0, 1.0], [100.0, 0.0]
+  ] ]
+}</pre>
+        <p>looks a little different to the web server:</p>
+        <pre>%7B%22type%22:%22Polygon%22,%22coordinates%22:%5B%5B%5B100.0,0.0%5D,%5B101.0,0.0%5D,%5B101.0,1.0%5D,%5B100.0,1.0%5D,%5B100.0,0.0%5D%5D%5D%7D</pre>
+        <h3>Well-Known Text does make a good REST API</h3>
+        <p>WKT has only four delimiters: left &amp; right parentheses, comma and space. None of these characters are in the <em>other</em> category and when used in the query portion of a URL only one, the space, must be encoded. The polygon above looks like this to the web server when sent as WKT:</p>
+        <pre>POLYGON((100.0%200.0,101.0%200.0,101.0%201.0,100.0%201.0,100.0%200.0))</pre>
+        <p>It's not uncommon to encode space characters as plus signs. Plus signs are also a sub delimiter and do not need to be encoded. Google does this all the time with their APIs. Replacing the spaces with plus signs results in our web browser sending the polygon as:</p>
+        <pre>POLYGON((100.0+0.0,101.0+0.0,101.0+1.0,100.0+1.0,100.0+0.0))</pre>
+        <p>It's a bit shorter and it's a little more readable. It just so happens that there is an API defined that already has this plus sign transition as part of the spec and I talk about that below.</p>
+        <h3>OGC&#39;s current effort</h3>
+        <p>OGC is a professional organization that develops &quot;standards for geospatial and location based services.&quot; That is a very noble goal and for the most part the REST API for WMS and WFS works well. However, the standards OGC defined for performing spatial queries and retrieving spatial data over the web are not reasonable for developers that want to use them.</p>
+        <p>As I have stated, JSON is not designed to be part of a clean REST specification but it&#39;s certainly better than XML, XML is an even less reasonable approach because the OGC specification requires you to not only send the shape as XML but an entire GML filter including XML namespace definitions. GeoServer&#39;s documentation gives an example of a simple query to get any shapes that intersect a point (as seen by your web server):</p>
+        <pre>filter=%3CFilter%20xmlns:gml=%22http://www.opengis.net/gml%22%3E%3CIntersects%3E%3CPropertyName%3Ethe_geom%3C/PropertyName%3E%3Cgml:Point%20srsName=%224326%22%3E%3Cgml:coordinates%3E-74.817265,40.5296504%3C/gml:coordinates%3E%3C/gml:Point%3E%3C/Intersects%3E%3C/Filter%3E</pre>
+        <p>At the very least, Esri&#39;s REST API breaks out the filter parts into different query arguments. Beyond that, it replaces XML with JSON and includes a couple shortcuts for bounding box and point queries.</p>
+        <h3>Esri prefixes in an open standard?</h3>
+        <p>Esri&#39;s API has &quot;esri&quot; written all over it. If OGC were to adopt Esri's REST API, I would hope they could scrub out this branding. When using an open standard, I do not expect to ask the web server whether my esriGeometryPoint data esriSpatialRelIntersects any esriGeometryPolygons. [<a href="http://www.spatiallyadjusted.com/2011/06/16/esri-rest-api-could-be-an-ogc-standard/">James Fee</a> linked to an OSGeo <a href="http://lists.osgeo.org/pipermail/standards/2011-June/000438.html">list message</a> from someone with similar concerns.]</p>
+        <p>If OGC were to adopt the REST API, but on the condition that the esri prefix be removed, I would be confused if they didn't also go the extra step and adopt GeoJSON as the return format.</p>
+        <h3>GeoJSON returns</h3>
+        <p>While JSON is not a good request format but it is an incredibly good response format. It is simple and very clearly defined at <a href="http://geojson.org/">geojson.org</a>.</p>
+        <p>Esri&#39;s REST API does return JSON, which is good, but the objects it returns are a bit heavy and patterned after Esri's own data formats. Two examples jump out immediately:</p>
+        <p>The first is that Esri's response includes the field names of a result set three times: in the fieldAliases property, in the fields property and again in every feature returned. It also lists the field aliases twice. GeoJSON does not specify aliases and only returns the field names with each feature. The web developers decide if they need this metadata and if so, manage it however they want. <!--. If so, it is up to them to manage it. If not, they can hook the raw data up to pre-labeled HTML using the field name behind the scenes as an identifier utilizing HTML5&#39;s data attributes or whatever templating engine they want.--></p>
+        <p>The second quickly noticeable problem is that all results must be from the same layer and of the same type. It's one thing if this results from a limitation of your back end storage but another if it&#39;s part of your API specification, forcing all future implementations to follow suit. All responses in the Esri specification return a single geometryType property. No modern spatial database servers require this and it is not a limitation in GeoServer&#39;s layer groups. Each feature in GeoJSON has its own geometry with its own geometry type.</p>
+        <h2>It&#39;s not the only option</h2>
+        <p>It&#39;s good to see that OGC is looking to pave cowpaths, especially given W3C&#39;s recent success with garnering interest in HTML5. However, I'm concerned they will choose a single company's offering, ignoring other efforts within the spatial community. I would like to remind developers that other groups and specifications exist and are being used in open source communities, two of which I describe below.</p>
+        <p>There are definitely parts of the Esri REST API worth looking at and incorporating. While it's important that OGC define a more useful API than what they currently recommend, I suggest taking Esri&#39;s approach as a basis for research and either extending one of the existing open source options or defining an new one rather than fully adopting Esri's.</p>
+        <h3>GeoServer</h3>
+        <p>GeoServer returns GeoJSON and allows OGC&#39;s XML-based queries. However, they also support a Common Query Language filter which uses Well-Known Text for a &quot;much more compact and human readable syntax compared to OGC filters.&quot; This specification was, in fact, created by OGC for use with managing catalog services. GeoServer has repurposed it for spatial data queries. It has limitations but it is a very good start that should be given a chance.</p>
+        <h3>GeoCouch</h3>
+        <p>I am new to GeoCouch, but every time I hear a new detail about how it works, I realize it&#39;s very close to what I want as a web developer.</p>
+        <p>GeoCouch can return GeoJSON. Because of their design document approach, it can easily return your source data in any format you want. For a spatial query API, GeoCouch chose the <a href="http://www.opensearch.org/Specifications/OpenSearch/Extensions/Geo/1.0/Draft_2">OpenSearch Geo Extension API</a> which uses primarily Well-Known Text but has shorthand queries for bounding box, point and radius searches. It also allows a plus instead of a space to make WKT queries look just a little nicer.</p>
+        <h2>Will anyone notice?</h2>
+        <p>The open source community appears to be perfectly happy doing their own thing if they don&#39;t like a specification. Had the W3C chosen to document only IE&#39;s implementations of CSS3 and HTML5, the other browser vendors and many web designers would continue to ignore them in favor of <a href="http://whatwg.org">WHATWG.org</a>. In the open spatial community, GeoServer &amp; GeoCouch can both return GeoJSON and allow spatial queries in a format better suited to a REST API. OpenSearch could (and maybe should) submit their implementation to OGC, but again, I&#39;m not sure how much it will matter. If OGC adopts the Esri REST API as a standard, GeoServer will implement it but I don&#39;t think they will throw away CQL. I don&#39;t think anyone will implement it for GeoCouch, which is fine.</p>
+        <h2>
+          Round trip</h2>
+        <p>
+          The open source spatial community should decide on a better REST API. Esri offered theirs but I don&#39;t think it&#39;s the best option for various reasons. I've mentioned two great projects to use as starting points and I am sure there are more out there. Regardless of API, they should settle on GeoJSON as a response format, as many individual spatial developers have already done.</p>
+        <p>I welcome your comments below, or by email or Twitter.</p>
+        <a href="http://twitter.com/share" class="twitter-share-button" data-count="none" data-via="ryanttb">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+  /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+  var disqus_shortname = 'trippingthebits'; // required: replace example with your forum shortname
+
+  // The following are highly recommended additional parameters. Remove the slashes in front to use.
+  var disqus_identifier = 'ttb_2011_06_16_spatialrestapi';
+  var disqus_url = 'http://trippingthebits.com/spatialrestapi/';
+
+  /* * * DON'T EDIT BELOW THIS LINE * * */
+  (function () {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+        <h2>
+          References</h2>
+        <ul>
+          <li><a href="http://www.spatiallyadjusted.com/2011/06/16/esri-rest-api-could-be-an-ogc-standard/">http://www.spatiallyadjusted.com/2011/06/16/esri-rest-api-could-be-an-ogc-standard/</a></li>
+          <li><a href="http://www.json.org/">http://www.json.org/</a></li>
+          <li><a href="http://en.wikipedia.org/wiki/Percent-encoding">http://en.wikipedia.org/wiki/Percent-encoding</a></li>
+          <li><a href="http://tools.ietf.org/html/rfc3986">http://tools.ietf.org/html/rfc3986</a></li>
+          <li><a href="http://en.wikipedia.org/wiki/Well-known_text">http://en.wikipedia.org/wiki/Well-known_text</a></li>
+          <li><a href="http://help.arcgis.com/en/arcgisserver/10.0/apis/rest/index.html">http://help.arcgis.com/en/arcgisserver/10.0/apis/rest/index.html</a></li>
+          <li><a href="http://lists.osgeo.org/pipermail/standards/2011-June/000438.html">http://lists.osgeo.org/pipermail/standards/2011-June/000438.html</a></li>
+          <li><a href="http://geojson.org/geojson-spec.html">http://geojson.org/geojson-spec.html</a></li>
+          <li><a href="http://www.opengeospatial.org/standards/cat">http://www.opengeospatial.org/standards/cat</a></li>
+          <li><a href="http://docs.geoserver.org/latest/en/user/index.html">http://docs.geoserver.org/latest/en/user/index.html</a></li>
+          <li><a href="http://blog.gitorious.org/">http://blog.gitorious.org/</a></li>
+          <li><a href="http://www.opensearch.org/Specifications/OpenSearch/Extensions/Geo/1.0/Draft_2">http://www.opensearch.org/Specifications/OpenSearch/Extensions/Geo/1.0/Draft_2</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.6.1.min.js" type="text/javascript"></script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26113662-1'], ['_trackPageview']];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g,s)}(document,'script'));
+  </script>
+</body>
+</html>

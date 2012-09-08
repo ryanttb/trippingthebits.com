@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>Demo</title>
+  <link href="../../styles/default.css" rel="stylesheet" type="text/css" />
+  <style type="text/css">
+    th
+    {
+      padding-right: 8px;
+      text-align: right;
+    }
+    input
+    {
+      width: 256px;
+    }
+    #cmdClear
+    {
+      width: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="frame">
+    <div>
+      <div id="content">
+        <h1 style="display: none;">
+          SpecLibs!</h1>
+        <form>
+          <table>
+            <tr>
+              <th>
+                noun
+              </th>
+              <td>
+                <input type="text" data-text="item" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                noun
+              </th>
+              <td>
+                <input type="text" data-text="imageData" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                a span of time
+              </th>
+              <td>
+                <input type="text" data-text="time" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                noun
+              </th>
+              <td>
+                <input type="text" data-text="string" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                plaural noun
+              </th>
+              <td>
+                <input type="text" data-text="data" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                evil noun
+              </th>
+              <td>
+                <input type="text" data-text="thread" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                present-tense verb
+              </th>
+              <td>
+                <input type="text" data-text="storing" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                noun
+              </th>
+              <td>
+                <input type="text" data-text="storage" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                plaural noun
+              </th>
+              <td>
+                <input type="text" data-text="cookies" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                exclamation
+              </th>
+              <td>
+                <input type="text" data-text="storageEvent" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                noun
+              </th>
+              <td>
+                <input type="text" data-text="key" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                present-tense verb
+              </th>
+              <td>
+                <input type="text" data-text="carryingOut" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                noun
+              </th>
+              <td>
+                <input type="text" data-text="request" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                person
+              </th>
+              <td>
+                <input type="text" data-text="script" />
+              </td>
+            </tr>
+            <tr>
+              <th>
+                noun
+              </th>
+              <td>
+                <input type="text" data-text="dataType" />
+              </td>
+            </tr>
+          </table>
+          <a href="display.html" target="playSpecLibs">Go!</a>
+          <input id="cmdClear" type="reset" value="Clear" class="fancyButton" />
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.2.min.js" type="text/javascript"></script>
+
+  <script type="text/javascript">
+    $(function() {
+      $("input:eq(0)").focus();
+
+      if ("localStorage" in window) {
+        $("input").bind("focus blur keypress", function() {
+          var $this = $(this);
+          window.localStorage.setItem($this.attr("data-text"), $this.val());
+        });
+
+        $("#cmdClear").click(function() {
+          window.localStorage.clear();
+        });
+
+        $("[data-text]").each(function() {
+          var $this = $(this);
+          $this.val(window.localStorage.getItem($this.attr("data-text")));
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
