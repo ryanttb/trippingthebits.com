@@ -31,7 +31,7 @@
 
         <p><b>Yes!</b></p>
 
-        <p>Apart from ajax, jQuery itself works fine on WinJS's Chakra engine. jQuery Geo does not use ajax itself so this is not a problem.</p>
+        <p>Apart from ajax, jQuery works fine on WinJS's Chakra engine. jQuery Geo does not use ajax itself so this is not a problem.</p>
 
         <p>The only change to the jQuery Geo source code I had to make was to surround any HTML text used to dynamically create elements with a Windows 8 JavaScript method: toStaticHtml. This is required when you pass HTML to any jQuery manipulation method such as append.</p>
 
@@ -43,11 +43,37 @@
 
         <code><pre>.append( toStaticHTML( <span class="str">'&lt;div /&gt;'</span> ) )</pre></code>
 
+        <p>That's all I had to change in the jQuery Geo source to get it working in Windows Store apps. Read on for more detail.</p>
+
         <h2>Discussion</h2>
 
         <h3>Including jQuery</h3>
 
-        <p>With Windows 8, it is possible to code Windows Store apps in HTML, CSS, &amp; JavaScript. </p>
+        <p>With Windows 8, it is possible to build Windows Store apps with HTML, CSS, &amp; JavaScript. A web developer, when seeing this for the first time, will likely ask, &quot;What about jQuery?&quot;</p>
+
+        <p>The first moment I got an empty WinJS project in front of me, I included jQuery. Since we are building a desktop app that can be installed from the Windows Store, we have to include jQuery's minified script in our project and reference it locally.</p>
+        
+        <p>In Visual Studio 2012, create a new project with:</p>
+
+        <p>FILE =&gt; New Project =&gt; Templates =&gt; JavaScript =&gt; Windows Store style =&gt; Blank App.</p>
+        
+        <p>Then download a copy of 1.8.1 from <a href="http://jquery.com/download">http://jquery.com/download</a>, include it in the project's js folder and add this to default.html:</p>
+
+        <code><pre>&lt;script src=<span class="str">&quot;/js/jquery-1.8.1.min.js&quot;</span>&gt;&lt;/script&gt;</pre></code>
+
+        <p>When you start the app, you will get three <i>Unable to add dynamic content</i> errors. This is jQuery/Sizzle feature detecting the JavaScript engine. The tests are based on dynamic content created using innerHTML. Windows 8 does not allow this without the toStaticHTML method so the tests will fail to correctly detect all WinJS features. However, I have not found issues with this when porting jQuery Geo and am hopeful that most of jQuery works as expected. If you find otherwise, you can download an un-minified version of jQuery and add toStaticHTML in these three places yourself.<p>
+
+        <h3>HTML1701</h3>
+
+        <p>Apart from jQuery's initial tests, you will get the same error any time you use jQuery manipulation methods yourself (such as append). The full text of the error is:</p>
+
+        <p>HTML1701: Unable to add dynamic content ''. A script attempted to inject dynamic content, or elements previously modified dynamically, that might be unsafe. For example, using the innerHTML property to add script or malformed HTML will generate this exception. Use the toStaticHTML method to filter dynamic content, or explicitly create elements and attributes with a method such as createElement. For more information, see <a href="http://go.microsoft.com/fwlink/?LinkID=247104">http://go.microsoft.com/fwlink/?LinkID=247104</a>.</p>
+
+        <p>The error message's first suggestion is to wrap your HTML in a call to toStaticHTML. This includes any HTML sent to jQuery. The toStaticHTML method strips tags and characters that pose a security threat. For example, it will completely remove script and link tags as well as inline event handlers. Since jQuery Geo doesn't append anything malicious, we chose to wrap any HTML in cals to append with this method which came to about eight calls and an extra 112 characters. We can shrink that during minification.</p>
+
+        <p>The second suggestion is to use DOM methods such as createElement but, if you are creating fancy element hierarchies with data attributes and classes, this can get wordy and not worth dropping the convenience of innerHTML.</p>
+
+        <p>If your expecting a change in jQuery core to wrap you HTML internally when required I wouldn't get your hopes up. There is no reason for the jQuery team to change how append works when it's just as easy for you to change how you call append when writing a Windows Store app.</p>
 
         <h2>Round trip</h2>
 
@@ -59,7 +85,10 @@
         <div id="tags">
           <ul>
             <li>
-              <a href="http://twitter.com/#search?q=toStaticHTML">toStaticHTML on Twitter</a>
+              <a href="http://msdn.microsoft.com/en-us/library/windows/apps/hh466094.aspx">toStaticHTML on MSDN</a>
+            </li>
+            <li>
+              <a href="http://go.microsoft.com/fwlink/?LinkID=247104">Developing secure apps on MSDN</a>
             </li>
           </ul>
         </div>
