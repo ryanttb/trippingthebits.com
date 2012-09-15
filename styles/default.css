@@ -112,6 +112,11 @@ code>pre .str, .csharpcode .type
   font-weight: bold;
 }
 
+code>pre .comment
+{
+  color: #226D22;
+}
+
 time
 {
   font-style: italic;
