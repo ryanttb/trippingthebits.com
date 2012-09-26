@@ -61,7 +61,7 @@
 
         <code><pre>&lt;script src=<span class="str">&quot;/js/jquery-1.8.1.min.js&quot;</span>&gt;&lt;/script&gt;</pre></code>
 
-        <p>When you start the app, you will get three <i>Unable to add dynamic content</i> errors. This is jQuery/Sizzle feature detecting the JavaScript engine. The tests are based on dynamic content created using innerHTML. Windows 8 does not allow this without the toStaticHTML method so the tests will fail to correctly detect all WinJS features. However, I have not found issues with this when porting jQuery Geo and am hopeful that most of jQuery works as expected. If you find otherwise, you can download an un-minified version of jQuery and add toStaticHTML in these three places yourself.<p>
+        <p>When you start the app, you will get three <i>Unable to add dynamic content</i> errors. This is jQuery/Sizzle feature detecting the JavaScript engine. The tests are based on dynamic content created using innerHTML. Windows 8 does not allow this without the toStaticHTML method so the tests will fail to correctly detect all WinJS features. However, I have not found issues with this when porting jQuery Geo and am hopeful that most of jQuery works as expected. If you find otherwise, you can download an un-minified version of jQuery and add toStaticHTML in these three places yourself.</p>
 
         <h3>HTML1701</h3>
 
@@ -69,7 +69,7 @@
 
         <blockquote>HTML1701: Unable to add dynamic content ''. A script attempted to inject dynamic content, or elements previously modified dynamically, that might be unsafe. For example, using the innerHTML property to add script or malformed HTML will generate this exception. Use the toStaticHTML method to filter dynamic content, or explicitly create elements and attributes with a method such as createElement. For more information, see <a href="http://go.microsoft.com/fwlink/?LinkID=247104">http://go.microsoft.com/fwlink/?LinkID=247104</a>.</blockquote>
 
-        <p>The error message's first suggestion is to wrap your HTML in a call to toStaticHTML. This includes any HTML sent to jQuery. The toStaticHTML method strips tags and characters that pose a security threat. For example, it will completely remove script and link tags as well as inline event handlers. I found some posts online stating that it also strips HTML5 data attributes but that has not been the case in my testing (that would break jQuery Geo significantly).</p>
+        <p>The error message's first suggestion is to wrap your HTML in a call to toStaticHTML. This includes any HTML sent to jQuery. The toStaticHTML method strips tags and characters that pose a security threat. For example, it will completely remove script and link tags as well as inline event handlers. I found some posts online stating that it also strips HTML5 data attributes but that has not been the case in my testing. jQuery Geo relies heavilly on data attributes and wouldn't work very well in Windows 8 without them.</p>
         
         <p>The second suggestion is to use DOM methods such as createElement but, if you are creating fancy element hierarchies with data attributes and classes, this can get wordy and is not worth dropping the convenience of innerHTML.</p>
 
@@ -105,6 +105,9 @@ this._$elem.append( toStaticHTML( this._$existingChildren ) ); <span class="comm
             </li>
             <li>
               <a href="http://go.microsoft.com/fwlink/?LinkID=247104">Developing secure apps on MSDN</a>
+            </li>
+            <li>
+              <a href="http://stackoverflow.com/questions/12234931/why-does-tostatichtml-remove-data-attributes">Why does toStaticHTML remove data-* attributes on SO</a>
             </li>
           </ul>
         </div>
