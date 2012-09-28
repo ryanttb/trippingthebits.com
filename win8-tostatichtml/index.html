@@ -31,7 +31,7 @@
 
         <h3>Yes!</h3>
 
-        <p>Apart from ajax, jQuery works fine on WinJS's Chakra engine. jQuery Geo does not use ajax itself so this is not a problem.</p>
+        <p>Apart from $.ajax, jQuery works fine on WinJS's Chakra engine. jQuery Geo does not use ajax itself so this is not a problem.</p>
 
         <p>The only change I had to make to jQuery Geo's source code was to surround any HTML text used to dynamically create elements with a Windows 8 JavaScript method: toStaticHtml. This is required when you pass HTML to any jQuery manipulation method such as append.</p>
 
@@ -69,11 +69,11 @@
 
         <blockquote>HTML1701: Unable to add dynamic content ''. A script attempted to inject dynamic content, or elements previously modified dynamically, that might be unsafe. For example, using the innerHTML property to add script or malformed HTML will generate this exception. Use the toStaticHTML method to filter dynamic content, or explicitly create elements and attributes with a method such as createElement. For more information, see <a href="http://go.microsoft.com/fwlink/?LinkID=247104">http://go.microsoft.com/fwlink/?LinkID=247104</a>.</blockquote>
 
-        <p>The error message's first suggestion is to wrap your HTML in a call to toStaticHTML. This includes any HTML sent to jQuery. The toStaticHTML method strips tags and characters that pose a security threat. For example, it will completely remove script and link tags as well as inline event handlers. I found some posts online stating that it also strips HTML5 data attributes but that has not been the case in my testing. jQuery Geo relies heavilly on data attributes and wouldn't work very well in Windows 8 without them.</p>
+        <p>The error message's first suggestion is to wrap your HTML in a call to toStaticHTML. This includes any HTML sent to jQuery. The toStaticHTML method strips tags and characters that pose a security threat. For example, it will completely remove script and link tags as well as inline event handlers. I found some posts online stating that it also strips HTML5 data attributes but that has not been the case in my testing. jQuery Geo relies heavily on data attributes and wouldn't work very well in Windows 8 without them.</p>
         
         <p>The second suggestion is to use DOM methods such as createElement but, if you are creating fancy element hierarchies with data attributes and classes, this can get wordy and is not worth dropping the convenience of innerHTML.</p>
 
-        <p>Since jQuery Geo doesn't append anything malicious, I chose to follow the first suggestion and wrap our dynamic HTML. We have eight calls which comes to about an extra 112 characters. We can shrink that further using minification tricks.</p>
+        <p>Since jQuery Geo doesn't append anything malicious, I chose to follow the first suggestion and wrap our dynamic HTML. We have eight calls which come to about an extra 112 characters. We can shrink that further using minification tricks.</p>
 
         <p>Lastly, if you're expecting a change in jQuery core to wrap HTML internally don't get your hopes up. The jQuery team works toward web standards and this is neither web nor standard. It is more correct for developers to change how they call append when they know they're writing a Windows Store app.</p>
 
@@ -91,7 +91,7 @@ this._$elem.append( toStaticHTML( this._$existingChildren ) ); <span class="comm
 
         <p>The toStaticHTML method is not new. It was introduced in IE8 as a first-pass security option to scrub user input. Web apps generally run in a sandbox and do not have much access to the system. Windows Store apps run on the desktop as the user with various levels of access. It makes more sense in this context to require scrubbing in an attempt to prevent malicious actions such as deleting a user's files.</p>
 
-        <p>It may seem like a pain to have to call this method any time you want to create dynamic elements with HTML text but I'm happy that this is all I had to do to port jQuery Geo to Windows 8.</p>
+        <p>It may seem like a pain to have to call this method any time you want to create dynamic elements with HTML text but I'm happy that this is all I had to do to port jQuery Geo to Windows 8. jQuery Geo 1.0b2 will support Windows Store apps.</p>
 
       </div>
 
@@ -100,6 +100,9 @@ this._$elem.append( toStaticHTML( this._$existingChildren ) ); <span class="comm
 
         <div id="tags">
           <ul>
+            <li>
+              <a href="http://jquerygeo.com">jQuery Geo</a>
+            </li>
             <li>
               <a href="http://msdn.microsoft.com/en-us/library/windows/apps/hh465388.aspx">toStaticHTML on MSDN</a>
             </li>
