@@ -27,11 +27,15 @@
         <time>2012-09-10</time>
         <p>I recently attended a Windows 8 DevCamp with the intention of installing Microsoft's latest OS for the first time and getting jQuery Geo to work as a native app on top of WinJS.</p>
 
+        <h2>What is jQuery Geo?</h2>
+
+        <p>jQuery Geo ( <a href="http://jquerygeo.com">http://jquerygeo.com</a> ) is a JavaScript mapping API similar in concept to Bing Maps API and Google Maps API. It is open-source and uses open data by default but can consume any map and data service a developer wishes to use. It is well documented and the API design is inspired by the elegant style of jQuery itself. Write less, map more!</p>
+
         <h2>Did it work?</h2>
 
         <h3>Yes!</h3>
 
-        <p>Apart from $.ajax, jQuery works fine on WinJS's Chakra engine. jQuery Geo does not use ajax itself so this is not a problem.</p>
+        <p>Apart from $.ajax, jQuery works fine on WinJS's Chakra engine. jQuery Geo does not use AJAX itself so this is not a problem.</p>
 
         <p>The only change I had to make to jQuery Geo's source code was to surround any HTML text used to dynamically create elements with a Windows 8 JavaScript method: toStaticHtml. This is required when you pass HTML to any jQuery manipulation method such as append.</p>
 
@@ -44,6 +48,11 @@
         <code><pre>.append( toStaticHTML( <span class="str">'&lt;div /&gt;'</span> ) )</pre></code>
 
         <p>That's all I had to change in the jQuery Geo source to get it working in Windows Store apps. Read on for more detail.</p>
+
+        <figure>
+          <img src="win8-jquerygeo.png" style="width: 100%">
+          <figcaption>WinJS in Visual Studio 2012 debugging a jQuery Geo Windows Store app (snapped to right) mapping tweets</figcaption>
+        </figure>
 
         <h2>Discussion</h2>
 
